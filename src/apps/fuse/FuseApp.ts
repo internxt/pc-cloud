@@ -88,10 +88,15 @@ export class FuseApp {
   }
 
   async stop(): Promise<void> {
-    this._fuse?.unmount((err: any) => {
-      if (err) {
-        Logger.error(`[FUSE] unmount error: ${err}`);
-      }
+    return new Promise((resolve, reject) => {
+      this._fuse?.unmount((err: any) => {
+        if (err) {
+          Logger.error(`[FUSE] unmount error: ${err}`);
+          return reject(err);
+        }
+
+        resolve();
+      });
     });
   }
 
