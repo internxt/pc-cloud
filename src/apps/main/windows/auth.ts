@@ -25,7 +25,7 @@ export const createAuthWindow = async () => {
     skipTaskbar: true,
   });
 
-  const authLoaded = authWindow.loadURL(resolveHtmlPath('login'));
+  const authLoaded = authWindow.loadURL(resolveHtmlPath(''));
 
   authWindow.on('ready-to-show', () => {
     authWindow?.show();
