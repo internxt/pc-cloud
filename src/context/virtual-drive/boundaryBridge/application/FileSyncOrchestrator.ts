@@ -1,10 +1,10 @@
 import { RetryContentsUploader } from '../../contents/application/RetryContentsUploader';
-import { FileSyncronizer } from '../../files/application/FileSyncronizer';
+import { FileSynchronizer } from '../../files/application/FileSyncronizer';
 
 export class FileSyncOrchestrator {
   constructor(
     private readonly contentsUploader: RetryContentsUploader,
-    private readonly fileSyncronizer: FileSyncronizer
+    private readonly fileSyncronizer: FileSynchronizer
   ) {}
 
   async run(absolutePaths: string[]): Promise<void> {
