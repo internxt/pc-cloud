@@ -78,4 +78,6 @@ export type FilesEvents = {
   FILE_OVERWRITTEN: (payload: { nameWithExtension: string }) => void;
 
   FILE_CLONED: (payload: FileUpdatePayload) => void;
+
+  FILE_PREPARING: (payload: FileUpdatePayload) => void;
 };

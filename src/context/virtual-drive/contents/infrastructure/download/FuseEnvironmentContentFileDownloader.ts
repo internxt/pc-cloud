@@ -26,6 +26,10 @@ export class FuseEnvironmentContentFileDownloader
     this.state = null;
   }
 
+  removeListeners(): void {
+    // no-op
+  }
+
   forceStop(): void {
     //@ts-ignore
     // Logger.debug('Finish emitter type', this.state?.type);

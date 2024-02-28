@@ -71,11 +71,11 @@ export class DeleteController extends CallbackController {
     throw new Error(`Placeholder Id not identified:  ${trimmedId}`);
   }
 
-  private CleanQueuesByFolder(folderUuid: Folder['uuid']) {
+  private async CleanQueuesByFolder(folderUuid: Folder['uuid']) {
     // always remove files from the filesQueue if a folder is added
     this.CleanQueueFile(folderUuid);
     // remove child folders from the queue if a parent folder exists
-    this.CleanQueueFolder(folderUuid);
+    await this.CleanQueueFolder(folderUuid);
   }
 
   private CleanQueueFile(folderUuid: Folder['uuid']) {
@@ -88,10 +88,10 @@ export class DeleteController extends CallbackController {
     });
   }
 
-  private CleanQueueFolder(folderUuid: Folder['uuid']) {
+  private async CleanQueueFolder(folderUuid: Folder['uuid']) {
     const reversedFolders = this.foldersQueue.reversedValues;
-    reversedFolders.forEach((folder) => {
-      const isParentFolder = this.folderContainerDetector.run(
+    const allDone = reversedFolders.map(async (folder) => {
+      const isParentFolder = await this.folderContainerDetector.run(
         folder,
         folderUuid
       );
@@ -99,5 +99,7 @@ export class DeleteController extends CallbackController {
         this.foldersQueue.removeOne(folder);
       }
     });
+
+    await Promise.all(allDone);
   }
 }

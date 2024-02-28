@@ -28,11 +28,11 @@ MainProcessSyncEngineIPC.on('FILE_DOWNLOADING', () => {
   setTrayStatus('SYNCING');
 });
 
-ipcMainDrive.on('FILE_PREPARING', () => {
+MainProcessSyncEngineIPC.on('FILE_PREPARING', () => {
   setTrayStatus('SYNCING');
 });
 
-ipcMainDrive.on('FILE_DOWNLOADED', () => {
+MainProcessSyncEngineIPC.on('FILE_DOWNLOADED', () => {
   setTrayStatus('IDLE');
 });
 

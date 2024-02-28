@@ -20,7 +20,7 @@ export class FoldersFatherSyncStatusUpdater {
     if (posixDir === '/') {
       return;
     }
-    const folder = await this.repository.searchByPartial({ path: posixDir });
+    const folder = this.repository.matchingPartial({ path: posixDir })[0];
     if (folder) {
       Logger.debug(`Updating sync status for ${folder.path}`);
       await this.localFileSystem.updateSyncStatus(folder);

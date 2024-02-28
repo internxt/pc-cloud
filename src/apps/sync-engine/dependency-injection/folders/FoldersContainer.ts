@@ -15,6 +15,7 @@ import { FolderPlaceholderConverter } from '../../../../context/virtual-drive/fo
 import { FolderSyncStatusUpdater } from '../../../../context/virtual-drive/folders/application/FolderSyncStatusUpdater';
 import { FoldersFatherSyncStatusUpdater } from '../../../../context/virtual-drive/folders/application/FoldersFatherSyncStatusUpdater';
 import { FolderFinder } from '../../../../context/virtual-drive/folders/application/FolderFinder';
+import { FolderContainerDetector } from '../../../../context/virtual-drive/folders/application/FolderContainerDetector';
 
 export interface FoldersContainer {
   folderCreator: FolderCreatorFromOfflineFolder;
@@ -36,4 +37,5 @@ export interface FoldersContainer {
   folderSyncStatusUpdater: FolderSyncStatusUpdater;
   foldersFatherSyncStatusUpdater: FoldersFatherSyncStatusUpdater;
   folderFinder: FolderFinder;
+  folderContainerDetector: FolderContainerDetector;
 }

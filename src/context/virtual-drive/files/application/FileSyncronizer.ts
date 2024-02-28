@@ -83,25 +83,29 @@ export class FileSynchronizer {
     posixRelativePath: string,
     filePath: FilePath,
     upload: (path: string) => Promise<RemoteFileContents>,
-    attemps = 3
+    attempts = 3
   ) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       const fileContents = await upload(posixRelativePath);
-      const createdFile = await this.fileCreator.run(filePath, fileContents);
+      const createdFile = await this.fileCreator.run(
+        filePath,
+        fileContents.id,
+        fileContents.size
+      );
       await this.convertAndUpdateSyncStatus(createdFile);
     } catch (error: unknown) {
       Logger.error('Error creating file:', error);
       if (error instanceof FolderNotFoundError) {
         await this.createFolderFather(posixRelativePath);
       }
-      if (attemps > 0) {
+      if (attempts > 0) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         await this.retryCreation(
           posixRelativePath,
           filePath,
           upload,
-          attemps - 1
+          attempts - 1
         );
         return;
       }
@@ -141,8 +145,8 @@ export class FileSynchronizer {
     }
   }
 
-  private hasDifferentSize(file: File, absoulthePath: string) {
-    const stats = fs.statSync(absoulthePath);
+  private hasDifferentSize(file: File, absolutePath: string) {
+    const stats = fs.statSync(absolutePath);
     return Math.abs(file.size - stats.size) > 0.001;
   }
 
@@ -153,14 +157,14 @@ export class FileSynchronizer {
     ]);
   }
 
-  private retryFolderCreation = async (posixDir: string, attemps = 3) => {
+  private retryFolderCreation = async (posixDir: string, attempts = 3) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 4000));
       await this.runFolderCreator(posixDir);
     } catch (error) {
       Logger.error('Error creating folder father creation:', error);
-      if (attemps > 0) {
-        await this.retryFolderCreation(posixDir, attemps - 1);
+      if (attempts > 0) {
+        await this.retryFolderCreation(posixDir, attempts - 1);
         return;
       }
     }

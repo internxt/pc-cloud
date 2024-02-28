@@ -1,4 +1,5 @@
 import { CreateFilePlaceholderOnDeletionFailed } from '../../../../context/virtual-drive/files/application/CreateFilePlaceholderOnDeletionFailed';
+import { FileCheckerStatusInRoot } from '../../../../context/virtual-drive/files/application/FileCheckerStatusInRoot';
 import { FileCreator } from '../../../../context/virtual-drive/files/application/FileCreator';
 import { FileDeleter } from '../../../../context/virtual-drive/files/application/FileDeleter';
 import { FileFolderContainerDetector } from '../../../../context/virtual-drive/files/application/FileFolderContainerDetector';
@@ -26,4 +27,5 @@ export interface FilesContainer {
   filesPlaceholderCreator: FilesPlaceholderCreator;
   filesPlaceholderUpdater: FilesPlaceholderUpdater;
   singleFileMatchingFinder: SingleFileMatchingFinder;
+  filesCheckerStatusInRoot: FileCheckerStatusInRoot;
 }

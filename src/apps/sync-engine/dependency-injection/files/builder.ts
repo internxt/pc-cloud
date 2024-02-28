@@ -171,6 +171,7 @@ export async function buildFilesContainer(
     filesPlaceholderCreator,
     filesPlaceholderUpdater,
     singleFileMatchingFinder,
+    filesCheckerStatusInRoot,
   };
 
   return { container, subscribers: [] };

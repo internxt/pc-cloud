@@ -4,19 +4,17 @@ import { FolderRepository } from '../domain/FolderRepository';
 export class FolderContainerDetector {
   constructor(private readonly repository: FolderRepository) {}
 
-  run(
-    fodlerContentId: Folder['uuid'],
+  async run(
+    folderContentId: Folder['uuid'],
     parentFolderContentId: Folder['uuid']
-  ): boolean {
-    const folder = this.repository.searchByPartial({ uuid: fodlerContentId });
+  ): Promise<boolean> {
+    const folder = await this.repository.searchByUuid(folderContentId);
 
     if (!folder) {
       throw new Error('Folder not found');
     }
 
-    const parent = this.repository.searchByPartial({
-      id: folder.parentId as number,
-    });
+    const parent = await this.repository.searchById(folder.parentId as number);
 
     if (!parent) {
       throw new Error('Parent folder not found');

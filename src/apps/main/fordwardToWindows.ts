@@ -20,7 +20,7 @@ MainProcessSyncEngineIPC.on('FILE_DOWNLOADING', (_, payload) => {
   });
 });
 
-ipcMainDrive.on('FILE_PREPARING', (_, payload) => {
+MainProcessSyncEngineIPC.on('FILE_PREPARING', (_, payload) => {
   const { nameWithExtension, processInfo } = payload;
 
   broadcastToWindows('sync-info-update', {
@@ -30,7 +30,7 @@ ipcMainDrive.on('FILE_PREPARING', (_, payload) => {
   });
 });
 
-ipcMainDrive.on('FILE_DOWNLOADED', (_, payload) => {
+MainProcessSyncEngineIPC.on('FILE_DOWNLOADED', (_, payload) => {
   const { nameWithExtension } = payload;
 
   broadcastToWindows('sync-info-update', {

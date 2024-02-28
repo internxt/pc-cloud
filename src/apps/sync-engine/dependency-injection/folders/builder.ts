@@ -173,5 +173,6 @@ export async function buildFoldersContainer(
     folderPlaceholderConverter,
     folderSyncStatusUpdater,
     foldersFatherSyncStatusUpdater,
+    folderContainerDetector,
   };
 }

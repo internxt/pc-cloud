@@ -4,4 +4,6 @@ import { TreeEvents } from './backgroundEvents/tree';
 
 export type BackgroundProcessVirtualDriveEvents = FilesEvents &
   FolderEvents &
-  TreeEvents;
+  TreeEvents & {
+    CHECK_SYNC: () => void;
+  };

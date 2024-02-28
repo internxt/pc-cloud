@@ -1,5 +1,5 @@
 type DriveOperationInProgress = {
-  action: 'UPLOADING' | 'DOWNLOADING' | 'RENAMING' | 'DELETING';
+  action: 'UPLOADING' | 'DOWNLOADING' | 'RENAMING' | 'DELETING' | 'PREPARING';
   progress: number;
   name: string;
 };
