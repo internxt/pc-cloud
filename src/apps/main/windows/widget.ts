@@ -69,7 +69,7 @@ export const createWidget = async () => {
   eventBus.emit('WIDGET_IS_READY');
 };
 
-export async function getOrCreateWidged(): Promise<BrowserWindow | null> {
+export async function getOrCreateWidget(): Promise<BrowserWindow | null> {
   if (widget) return widget;
 
   await createWidget();

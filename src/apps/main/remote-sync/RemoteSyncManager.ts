@@ -197,11 +197,11 @@ export class RemoteSyncManager {
   private async syncRemoteFiles(syncConfig: SyncConfig) {
     const lastFilesSyncAt = await helpers.getLastFilesSyncAt();
     try {
-      Logger.info(
-        `Syncing files updated from ${
-          lastFilesSyncAt ?? '(no last date provided)'
-        }`
-      );
+      // Logger.info(
+      //   `Syncing files updated from ${
+      //     lastFilesSyncAt ?? '(no last date provided)'
+      //   }`
+      // );
       const { hasMore, result } = await this.fetchFilesFromRemote(
         lastFilesSyncAt
       );
@@ -221,7 +221,7 @@ export class RemoteSyncManager {
         this.checkRemoteSyncStatus();
         return;
       }
-      Logger.info('Retrieving more files for sync');
+      // Logger.info('Retrieving more files for sync');
       await this.syncRemoteFiles({
         retry: 1,
         maxRetries: syncConfig.maxRetries,
@@ -256,11 +256,11 @@ export class RemoteSyncManager {
   private async syncRemoteFolders(syncConfig: SyncConfig) {
     const lastFoldersSyncAt = await helpers.getLastFoldersSyncAt();
     try {
-      Logger.info(
-        `Syncing folders updated from ${
-          lastFoldersSyncAt ?? '(no last date provided)'
-        }`
-      );
+      // Logger.info(
+      //   `Syncing folders updated from ${
+      //     lastFoldersSyncAt ?? '(no last date provided)'
+      //   }`
+      // );
       const { hasMore, result } = await this.fetchFoldersFromRemote(
         lastFoldersSyncAt
       );
@@ -270,7 +270,7 @@ export class RemoteSyncManager {
         await this.createOrUpdateSyncedFolderEntry(remoteFolder);
         const foldersUpdatedAt = new Date(remoteFolder.updatedAt);
 
-        Logger.info(`Saving folders updatedAt ${foldersUpdatedAt}`);
+        // Logger.info(`Saving folders updatedAt ${foldersUpdatedAt}`);
         helpers.saveLastFoldersSyncAt(foldersUpdatedAt, SYNC_OFFSET_MS);
         this.totalFoldersSynced++;
       }
@@ -325,7 +325,7 @@ export class RemoteSyncManager {
         : undefined,
     };
 
-    Logger.info('Requesting files');
+    // Logger.info('Requesting files');
 
     const response = await this.config.httpClient.get(
       `${process.env.NEW_DRIVE_URL}/drive/files`,

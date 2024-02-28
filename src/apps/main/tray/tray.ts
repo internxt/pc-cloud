@@ -3,7 +3,7 @@ import path from 'path';
 import PackageJson from '../../../../package.json';
 import eventBus from '../event-bus';
 import {
-  getOrCreateWidged,
+  getOrCreateWidget,
   setBoundsOfWidgetByPath,
   toggleWidgetVisibility,
 } from '../windows/widget';
@@ -130,7 +130,7 @@ export function setupTrayIcon() {
       return;
     }
 
-    const widgetWindow = await getOrCreateWidged();
+    const widgetWindow = await getOrCreateWidget();
     if (tray && widgetWindow) {
       setBoundsOfWidgetByPath(widgetWindow, tray);
     }

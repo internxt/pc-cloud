@@ -41,7 +41,7 @@ import * as Sentry from '@sentry/electron/main';
 import { AppDataSource } from './database/data-source';
 import { getIsLoggedIn } from './auth/handlers';
 import {
-  getOrCreateWidged,
+  getOrCreateWidget,
   getWidget,
   setBoundsOfWidgetByPath,
 } from './windows/widget';
@@ -122,7 +122,7 @@ eventBus.on('USER_LOGGED_IN', async () => {
       'system') as Theme;
 
     setTrayStatus('IDLE');
-    const widget = await getOrCreateWidged();
+    const widget = await getOrCreateWidget();
     const tray = getTray();
     if (widget && tray) {
       setBoundsOfWidgetByPath(widget, tray);
@@ -146,12 +146,19 @@ eventBus.on('USER_LOGGED_IN', async () => {
 });
 
 eventBus.on('USER_LOGGED_OUT', async () => {
+  Logger.debug('Changing tray status');
   setTrayStatus('IDLE');
+
   const widget = getWidget();
+
+  Logger.debug('Destroying widget window');
+
   if (widget) {
     widget.hide();
     widget.destroy();
   }
+
+  Logger.debug('Creating auth window');
 
   await createAuthWindow();
   if (AppDataSource.isInitialized) {

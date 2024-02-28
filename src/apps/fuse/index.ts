@@ -8,7 +8,7 @@ import { FuseDependencyContainerFactory } from './dependency-injection/FuseDepen
 import { HydrationApi } from '../hydration-api/HydrationApi';
 import { getRootVirtualDrive } from '../main/virtual-root-folder/service';
 
-let fuseApp: FuseApp;
+let fuseApp: FuseApp | null = null;
 
 async function startFuseApp() {
   const api = new HydrationApi();
@@ -36,16 +36,24 @@ async function startFuseApp() {
 }
 
 export async function stopSyncEngineWatcher() {
-  await fuseApp.stop();
+  await fuseApp?.stop();
 }
 
 async function stopAndClearFuseApp() {
-  await fuseApp.clearCache();
-  await fuseApp.stop();
+  try {
+    if (!fuseApp) {
+      return;
+    }
+
+    await fuseApp.clearCache();
+    // await fuseApp.stop();
+  } catch (err) {
+    Logger.error(err);
+  }
 }
 
 async function updateFuseApp() {
-  await fuseApp.update();
+  await fuseApp?.update();
 }
 
 eventBus.on('USER_LOGGED_OUT', stopAndClearFuseApp);
