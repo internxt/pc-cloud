@@ -2,19 +2,19 @@ import { FileRepositoryMock } from '../__mocks__/FileRepositoryMock';
 import { FileMother } from '../domain/FileMother';
 import { RemoteFileSystemMock } from '../__mocks__/RemoteFileSystemMock';
 import { LocalFileSystemMock } from '../__mocks__/LocalFileSystemMock';
-import { IpcRendererSyncEngineMock } from '../../shared/__mock__/IpcRendererSyncEngineMock';
 import { FileDeleter } from '../../../../../src/context/virtual-drive/files/application/FileDeleter';
 import { FolderRepositoryMock } from '../../folders/__mocks__/FolderRepositoryMock';
 import { ContentsIdMother } from '../../contents/domain/ContentsIdMother';
 import { AllParentFoldersStatusIsExists } from '../../../../../src/context/virtual-drive/folders/application/AllParentFoldersStatusIsExists';
+import { FileSyncNotifierMock } from '../__mocks__/FileSyncNotifierMock';
 import { FileStatus } from '../../../../../src/context/virtual-drive/files/domain/FileStatus';
 
 describe('File Deleter', () => {
   let repository: FileRepositoryMock;
   let allParentFoldersStatusIsExists: AllParentFoldersStatusIsExists;
   let remoteFileSystemMock: RemoteFileSystemMock;
-  let localFileSystemMock: LocalFileSystemMock;
-  let ipc: IpcRendererSyncEngineMock;
+  let localFilesSystemMock: LocalFileSystemMock;
+  let notifier: FileSyncNotifierMock;
 
   let SUT: FileDeleter;
 
@@ -24,26 +24,26 @@ describe('File Deleter', () => {
     allParentFoldersStatusIsExists = new AllParentFoldersStatusIsExists(
       folderRepository
     );
-    localFileSystemMock = new LocalFileSystemMock();
+    localFilesSystemMock = new LocalFileSystemMock();
     remoteFileSystemMock = new RemoteFileSystemMock();
-    ipc = new IpcRendererSyncEngineMock();
+    notifier = new FileSyncNotifierMock();
 
     SUT = new FileDeleter(
       remoteFileSystemMock,
-      localFileSystemMock,
+      localFilesSystemMock,
       repository,
       allParentFoldersStatusIsExists,
-      ipc
+      notifier
     );
   });
 
   it('does not nothing if the file its not found', async () => {
     const contentsId = ContentsIdMother.raw();
 
-    repository.searchByPartialMock.mockReturnValueOnce(undefined);
+    repository.searchByContentsIdMock.mockReturnValueOnce(undefined);
     jest
       .spyOn(allParentFoldersStatusIsExists, 'run')
-      .mockReturnValueOnce(false);
+      .mockResolvedValueOnce(false);
 
     await SUT.run(contentsId);
 
@@ -53,10 +53,10 @@ describe('File Deleter', () => {
   it('does not delete a file if it has a parent already trashed', async () => {
     const file = FileMother.any();
 
-    repository.searchByPartialMock.mockReturnValueOnce(file);
+    repository.searchByContentsIdMock.mockReturnValueOnce(file);
     jest
       .spyOn(allParentFoldersStatusIsExists, 'run')
-      .mockReturnValueOnce(false);
+      .mockResolvedValueOnce(false);
 
     await SUT.run(file.contentsId);
 
@@ -66,8 +66,10 @@ describe('File Deleter', () => {
   it('trashes the file if it exists and does not have any parent trashed', async () => {
     const file = FileMother.any();
 
-    repository.searchByPartialMock.mockReturnValueOnce(file);
-    jest.spyOn(allParentFoldersStatusIsExists, 'run').mockReturnValueOnce(true);
+    repository.searchByContentsIdMock.mockReturnValueOnce(file);
+    jest
+      .spyOn(allParentFoldersStatusIsExists, 'run')
+      .mockResolvedValueOnce(true);
 
     await SUT.run(file.contentsId);
 
@@ -77,8 +79,10 @@ describe('File Deleter', () => {
   it('trashes the file with the status trashed', async () => {
     const file = FileMother.any();
 
-    repository.searchByPartialMock.mockReturnValueOnce(file);
-    jest.spyOn(allParentFoldersStatusIsExists, 'run').mockReturnValueOnce(true);
+    repository.searchByContentsIdMock.mockReturnValueOnce(file);
+    jest
+      .spyOn(allParentFoldersStatusIsExists, 'run')
+      .mockResolvedValueOnce(true);
 
     await SUT.run(file.contentsId);
 

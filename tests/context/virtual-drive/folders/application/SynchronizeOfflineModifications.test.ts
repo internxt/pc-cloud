@@ -4,10 +4,11 @@ import { FolderPath } from '../../../../../src/context/virtual-drive/folders/dom
 import { FolderUuid } from '../../../../../src/context/virtual-drive/folders/domain/FolderUuid';
 import { FolderRenamedDomainEvent } from '../../../../../src/context/virtual-drive/folders/domain/events/FolderRenamedDomainEvent';
 import { InMemoryOfflineFolderRepository } from '../../../../../src/context/virtual-drive/folders/infrastructure/InMemoryOfflineFolderRepository';
+import { EventBusMock } from '../../shared/__mock__/EventBusMock';
 import { EventRepositoryMock } from '../../shared/__mock__/EventRepositoryMock';
-import { IpcRendererSyncEngineMock } from '../../shared/__mock__/IpcRendererSyncEngineMock';
 import { FolderRemoteFileSystemMock } from '../__mocks__/FolderRemoteFileSystemMock';
 import { FolderRepositoryMock } from '../__mocks__/FolderRepositoryMock';
+import { SyncFolderMessengerMock } from '../__mocks__/SyncFolderMessengerMock';
 import { FolderMother } from '../domain/FolderMother';
 import { OfflineFolderMother } from '../domain/OfflineFolderMother';
 
@@ -17,6 +18,7 @@ describe('Synchronize Offline Modifications', () => {
   let folderRemoteFileSystemMock: FolderRemoteFileSystemMock;
   let renamer: FolderRenamer;
   let eventRepositoryMock: EventRepositoryMock;
+  let messenger: SyncFolderMessengerMock;
 
   let SUT: SynchronizeOfflineModifications;
 
@@ -24,10 +26,13 @@ describe('Synchronize Offline Modifications', () => {
     offlineRepository = new InMemoryOfflineFolderRepository();
     folderRemoteFileSystemMock = new FolderRemoteFileSystemMock();
     repository = new FolderRepositoryMock();
+    messenger = new SyncFolderMessengerMock();
+
     renamer = new FolderRenamer(
       repository,
       folderRemoteFileSystemMock,
-      new IpcRendererSyncEngineMock()
+      new EventBusMock(),
+      messenger
     );
     eventRepositoryMock = new EventRepositoryMock();
 
@@ -46,7 +51,7 @@ describe('Synchronize Offline Modifications', () => {
 
     await SUT.run(FolderUuid.random().value);
 
-    expect(repository.searchByPartialMock).not.toBeCalled();
+    expect(repository.matchingPartialMock).not.toBeCalled();
   });
 
   it('throws an error if there is no folder with the given uuid', async () => {
@@ -54,7 +59,7 @@ describe('Synchronize Offline Modifications', () => {
       .spyOn(offlineRepository, 'searchByPartial')
       .mockReturnValueOnce(OfflineFolderMother.random());
 
-    repository.searchByPartialMock.mockReturnValueOnce(undefined);
+    repository.matchingPartialMock.mockReturnValueOnce(undefined);
 
     try {
       await SUT.run(FolderUuid.random().value);
@@ -80,7 +85,7 @@ describe('Synchronize Offline Modifications', () => {
       .spyOn(offlineRepository, 'searchByPartial')
       .mockReturnValueOnce(offlineFolder);
 
-    repository.searchByPartialMock.mockReturnValueOnce(folder);
+    repository.matchingPartialMock.mockReturnValueOnce(folder);
 
     const renamerSpy = jest.spyOn(renamer, 'run');
 
@@ -107,19 +112,22 @@ describe('Synchronize Offline Modifications', () => {
 
     const renamerSpy = jest.spyOn(renamer, 'run');
 
-    repository.searchByPartialMock.mockReturnValueOnce(folder);
+    repository.matchingPartialMock.mockReturnValueOnce([folder]);
 
     const event = new FolderRenamedDomainEvent({
       aggregateId: offlineFolder.uuid,
       previousPath: folder.path,
-      nextPath: offlineFolder.path.value,
+      nextPath: offlineFolder.path,
     });
 
     eventRepositoryMock.searchMock.mockResolvedValueOnce([event]);
 
     await SUT.run(offlineFolder.uuid);
 
-    expect(renamerSpy).toBeCalledWith(folder, offlineFolder.path);
+    expect(renamerSpy).toBeCalledWith(
+      folder,
+      new FolderPath(offlineFolder.path)
+    );
   });
 
   it('makes all the name changes recoded on the events', async () => {
@@ -147,9 +155,9 @@ describe('Synchronize Offline Modifications', () => {
 
     const renamerSpy = jest.spyOn(renamer, 'run');
 
-    repository.searchByPartialMock
-      .mockReturnValueOnce(afterCreation)
-      .mockReturnValueOnce(afterFirstRename);
+    repository.matchingPartialMock
+      .mockReturnValueOnce([afterCreation])
+      .mockReturnValueOnce([afterFirstRename]);
 
     const uuid = offlineFolder.uuid;
 

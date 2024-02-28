@@ -1,11 +1,17 @@
 name: Test
 
-on: [pull_request]
+on: []
 
 jobs:
   test:
     name: 🧪 Lint and test
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os:
+          - linux-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check out Git repository

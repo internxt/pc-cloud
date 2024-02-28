@@ -6,6 +6,7 @@ import {
 } from '../../../../../src/context/virtual-drive/folders/domain/Folder';
 import { FolderUuid } from '../../../../../src/context/virtual-drive/folders/domain/FolderUuid';
 import Chance from 'chance';
+import { FolderPathMother } from './FolderPathMother';
 const chance = new Chance();
 
 export class FolderMother {
@@ -25,20 +26,8 @@ export class FolderMother {
     return Folder.from({
       id: 2048,
       uuid: FolderUuid.random().value,
-      path: '/Zodseve',
+      path: FolderPathMother.any().value,
       parentId: null,
-      updatedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      status: FolderStatuses.EXISTS,
-    });
-  }
-
-  static in(folderId: number, path: string) {
-    return Folder.from({
-      id: 20445,
-      uuid: FolderUuid.random().value,
-      path,
-      parentId: folderId,
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       status: FolderStatuses.EXISTS,

@@ -1,11 +1,8 @@
 import { AllParentFoldersStatusIsExists } from '../../../../context/virtual-drive/folders/application/AllParentFoldersStatusIsExists';
-import { FolderByPartialSearcher } from '../../../../context/virtual-drive/folders/application/FolderByPartialSearcher';
-import { FolderContainerDetector } from '../../../../context/virtual-drive/folders/application/FolderContainerDetector';
-import { FolderCreator } from '../../../../context/virtual-drive/folders/application/FolderCreator';
-import { FolderDeleter } from '../../../../context/virtual-drive/folders/application/FolderDeleter';
-import { FolderFinder } from '../../../../context/virtual-drive/folders/application/FolderFinder';
+import { FolderCreatorFromOfflineFolder } from '../../../../context/virtual-drive/folders/application/FolderCreatorFromOfflineFolder';
+import { ParentFolderFinder } from '../../../../context/virtual-drive/folders/application/ParentFolderFinder';
 import { FolderPathUpdater } from '../../../../context/virtual-drive/folders/application/FolderPathUpdater';
-import { FolderRepositoryInitiator } from '../../../../context/virtual-drive/folders/application/FolderRepositoryInitiator';
+import { FolderRepositoryInitializer } from '../../../../context/virtual-drive/folders/application/FolderRepositoryInitializer';
 import { FoldersPlaceholderCreator } from '../../../../context/virtual-drive/folders/application/FoldersPlaceholderCreator';
 import { OfflineFolderCreator } from '../../../../context/virtual-drive/folders/application/Offline/OfflineFolderCreator';
 import { OfflineFolderPathUpdater } from '../../../../context/virtual-drive/folders/application/Offline/OfflineFolderPathUpdater';
@@ -17,16 +14,14 @@ import { FolderPlaceholderUpdater } from '../../../../context/virtual-drive/fold
 import { FolderPlaceholderConverter } from '../../../../context/virtual-drive/folders/application/FolderPlaceholderConverter';
 import { FolderSyncStatusUpdater } from '../../../../context/virtual-drive/folders/application/FolderSyncStatusUpdater';
 import { FoldersFatherSyncStatusUpdater } from '../../../../context/virtual-drive/folders/application/FoldersFatherSyncStatusUpdater';
+import { FolderFinder } from '../../../../context/virtual-drive/folders/application/FolderFinder';
 
 export interface FoldersContainer {
-  folderCreator: FolderCreator;
-  folderFinder: FolderFinder;
-  folderContainerDetector: FolderContainerDetector;
-  folderDeleter: FolderDeleter;
+  folderCreator: FolderCreatorFromOfflineFolder;
+  parentFolderFinder: ParentFolderFinder;
   retryFolderDeleter: RetryFolderDeleter;
   allParentFoldersStatusIsExists: AllParentFoldersStatusIsExists;
   folderPathUpdater: FolderPathUpdater;
-  folderByPartialSearcher: FolderByPartialSearcher;
   synchronizeOfflineModificationsOnFolderCreated: SynchronizeOfflineModificationsOnFolderCreated;
   offline: {
     folderCreator: OfflineFolderCreator;
@@ -34,10 +29,11 @@ export interface FoldersContainer {
     synchronizeOfflineModifications: SynchronizeOfflineModifications;
   };
   retrieveAllFolders: RetrieveAllFolders;
-  folderRepositoryInitiator: FolderRepositoryInitiator;
+  folderRepositoryInitiator: FolderRepositoryInitializer;
   folderPlaceholderUpdater: FolderPlaceholderUpdater;
   foldersPlaceholderCreator: FoldersPlaceholderCreator;
   folderPlaceholderConverter: FolderPlaceholderConverter;
   folderSyncStatusUpdater: FolderSyncStatusUpdater;
   foldersFatherSyncStatusUpdater: FoldersFatherSyncStatusUpdater;
+  folderFinder: FolderFinder;
 }

@@ -1,15 +1,15 @@
 import Logger from 'electron-log';
 import * as fs from 'fs';
+// @ts-ignore
 import { VirtualDrive } from 'virtual-drive/dist';
 import { FilePlaceholderId } from '../../context/virtual-drive/files/domain/PlaceholderId';
-import { ItemsSearcher } from '../../context/virtual-drive/items/application/ItemsSearcher';
 import { PlatformPathConverter } from '../../context/virtual-drive/shared/application/PlatformPathConverter';
 import { buildControllers } from './callbacks-controllers/buildControllers';
 import { executeControllerWithFallback } from './callbacks-controllers/middlewares/executeControllerWithFallback';
-import { DependencyContainer } from './dependency-injection/DependencyContainer';
-import { ipcRendererSyncEngine } from './ipcRendererSyncEngine';
-import { ProcessIssue } from '../shared/types';
-import { ipcRenderer } from 'electron';
+import { SyncEngineDependencyContainer } from './dependency-injection/SyncEngineDependencyContainer';
+import { SyncEngineIPC } from './SyncEngineIpc';
+import { VirtualDriveIssue } from '../../shared/issues/VirtualDriveIssue';
+import { ItemsSearcher } from '../../context/virtual-drive/tree/application/ItemsSearcher';
 
 export type CallbackDownload = (
   success: boolean,
@@ -25,7 +25,7 @@ export class BindingsManager {
   private static readonly PROVIDER_NAME = 'Internxt';
   private progressBuffer = 0;
   constructor(
-    private readonly container: DependencyContainer,
+    private readonly container: SyncEngineDependencyContainer,
     private readonly paths: {
       root: string;
       icon: string;
@@ -62,7 +62,7 @@ export class BindingsManager {
             Logger.error(error);
             callback(false);
           });
-        ipcRenderer.send('CHECK_SYNC');
+        SyncEngineIPC.send('CHECK_SYNC');
       },
       notifyDeleteCompletionCallback: () => {
         Logger.info('Deletion completed');
@@ -81,7 +81,7 @@ export class BindingsManager {
           ),
         });
         fn(absolutePath, contentsId, callback);
-        ipcRenderer.send('CHECK_SYNC');
+        SyncEngineIPC.send('CHECK_SYNC');
       },
       notifyFileAddedCallback: (
         absolutePath: string,
@@ -89,16 +89,16 @@ export class BindingsManager {
       ) => {
         Logger.debug('Path received from callback', absolutePath);
         controllers.addFile.execute(absolutePath, callback);
-        ipcRenderer.send('CHECK_SYNC');
+        SyncEngineIPC.send('CHECK_SYNC');
       },
       fetchDataCallback: async (
         contentsId: FilePlaceholderId,
         callback: CallbackDownload
       ) => {
         try {
-          Logger.debug('[Fetch Data Callback] Donwloading begins');
+          Logger.debug('[Fetch Data Callback] Downloading begins');
           const path = await controllers.downloadFile.execute(contentsId);
-          const file = controllers.downloadFile.fileFinderByContentsId(
+          const file = await controllers.downloadFile.fileFinderByContentsId(
             contentsId
               .replace(
                 // eslint-disable-next-line no-control-regex
@@ -123,7 +123,7 @@ export class BindingsManager {
                 this.progressBuffer = result.progress;
               }
               Logger.debug('condition', finished);
-              ipcRendererSyncEngine.send('FILE_PREPARING', {
+              SyncEngineIPC.send('FILE_PREPARING', {
                 name: file.name,
                 extension: file.type,
                 nameWithExtension: file.nameWithExtension,
@@ -155,7 +155,7 @@ export class BindingsManager {
           });
 
           fs.unlinkSync(path);
-          ipcRenderer.send('CHECK_SYNC');
+          SyncEngineIPC.send('CHECK_SYNC');
         } catch (error) {
           Logger.error(error);
           callback(false, '');
@@ -163,20 +163,19 @@ export class BindingsManager {
       },
       notifyMessageCallback: (
         message: string,
-        action: ProcessIssue['action'],
-        errorName: ProcessIssue['errorName'],
+        _error: VirtualDriveIssue['error'],
+        cause: VirtualDriveIssue['cause'],
         callback: (response: boolean) => void
       ) => {
         try {
           callback(true);
-          ipcRendererSyncEngine.send('SYNC_INFO_UPDATE', {
+          SyncEngineIPC.send('FILE_UPLOAD_ERROR', {
             name: message,
-            action: action,
-            errorName,
-            process: 'SYNC',
-            kind: 'LOCAL',
+            cause,
+            extension: '',
+            nameWithExtension: '',
           });
-          ipcRenderer.send('CHECK_SYNC');
+          SyncEngineIPC.send('CHECK_SYNC');
         } catch (error) {
           Logger.error(error);
           callback(false);
@@ -307,7 +306,7 @@ export class BindingsManager {
         (await this.container.virtualDrive.getPlaceholderWithStatePending()) as Array<string>;
       Logger.info('[SYNC ENGINE] fileInPendingPaths', fileInPendingPaths);
       await this.container.fileSyncOrchestrator.run(fileInPendingPaths);
-      ipcRenderer.send('CHECK_SYNC');
+      SyncEngineIPC.send('CHECK_SYNC');
     } catch (error) {
       Logger.error('[SYNC ENGINE] Polling', error);
     }

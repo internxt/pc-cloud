@@ -1,27 +1,38 @@
+import Logger from 'electron-log';
+import { ParentFolderFinder } from '../../folders/application/ParentFolderFinder';
+import { EventBus } from '../../shared/domain/EventBus';
+import { File } from '../domain/File';
+import { FilePath } from '../domain/FilePath';
+import { FileRepository } from '../domain/FileRepository';
+import { FileStatuses } from '../domain/FileStatus';
 import { ActionNotPermittedError } from '../domain/errors/ActionNotPermittedError';
 import { FileAlreadyExistsError } from '../domain/errors/FileAlreadyExistsError';
-import { FilePath } from '../domain/FilePath';
-import { File } from '../domain/File';
-import { FolderFinder } from '../../folders/application/FolderFinder';
-import { FileFinderByContentsId } from './FileFinderByContentsId';
-import { EventBus } from '../../shared/domain/EventBus';
-import { FileRepository } from '../domain/FileRepository';
-import { RemoteFileSystem } from '../domain/file-systems/RemoteFileSystem';
+import { FileNotFoundError } from '../domain/errors/FileNotFoundError';
+import { FileRenameFailedDomainEvent } from '../domain/events/FileRenameFailedDomainEvent';
+import { FileRenameStartedDomainEvent } from '../domain/events/FileRenameStartedDomainEvent';
 import { LocalFileSystem } from '../domain/file-systems/LocalFileSystem';
-import { SyncEngineIpc } from '../../../../apps/sync-engine/ipcRendererSyncEngine';
+import { RemoteFileSystem } from '../domain/file-systems/RemoteFileSystem';
+import { SingleFileMatchingSearcher } from './SingleFileMatchingSearcher';
 
 export class FilePathUpdater {
   constructor(
     private readonly remote: RemoteFileSystem,
     private readonly local: LocalFileSystem,
     private readonly repository: FileRepository,
-    private readonly fileFinderByContentsId: FileFinderByContentsId,
-    private readonly folderFinder: FolderFinder,
-    private readonly ipc: SyncEngineIpc,
+    private readonly singleFileMatching: SingleFileMatchingSearcher,
+    private readonly parentFolderFinder: ParentFolderFinder,
     private readonly eventBus: EventBus
   ) {}
 
   private async rename(file: File, path: FilePath) {
+    this.eventBus.publish([
+      new FileRenameStartedDomainEvent({
+        aggregateId: file.contentsId,
+        oldName: file.name,
+        nameWithExtension: path.nameWithExtension(),
+      }),
+    ]);
+
     file.rename(path);
 
     await this.remote.rename(file);
@@ -34,7 +45,7 @@ export class FilePathUpdater {
   private async move(file: File, destination: FilePath) {
     const trackerId = await this.local.getLocalFileId(file);
 
-    const destinationFolder = this.folderFinder.run(destination.dirname());
+    const destinationFolder = await this.parentFolderFinder.run(destination);
 
     file.moveTo(destinationFolder, trackerId);
 
@@ -47,40 +58,46 @@ export class FilePathUpdater {
 
   async run(contentsId: string, posixRelativePath: string) {
     const destination = new FilePath(posixRelativePath);
-    const file = this.fileFinderByContentsId.run(contentsId);
+    const file = await this.singleFileMatching.run({
+      contentsId,
+      status: FileStatuses.EXISTS,
+    });
+
+    if (!file) {
+      throw new FileNotFoundError(contentsId);
+    }
+
+    Logger.debug('FILE RENAMER FILE FOUNDED');
 
     if (file.dirname !== destination.dirname()) {
       if (file.nameWithExtension !== destination.nameWithExtension()) {
         throw new ActionNotPermittedError('rename and change folder');
       }
+
       await this.move(file, destination);
       return;
     }
 
-    const destinationFile = this.repository.searchByPartial({
+    const destinationFile = this.repository.matchingPartial({
       path: destination.value,
+      status: FileStatuses.EXISTS,
     });
 
     if (destinationFile) {
-      this.ipc.send('FILE_RENAME_ERROR', {
-        name: file.name,
-        extension: file.type,
-        nameWithExtension: file.nameWithExtension,
-        error: 'Renaming error: file already exists',
-      });
+      this.eventBus.publish([
+        new FileRenameFailedDomainEvent({
+          aggregateId: file.contentsId,
+          name: file.name,
+          extension: file.type,
+          nameWithExtension: file.nameWithExtension,
+          error: 'Renaming error: file already exists',
+        }),
+      ]);
       throw new FileAlreadyExistsError(destination.name());
     }
 
     if (destination.extensionMatch(file.type)) {
-      this.ipc.send('FILE_RENAMING', {
-        oldName: file.name,
-        nameWithExtension: destination.nameWithExtension(),
-      });
       await this.rename(file, destination);
-      this.ipc.send('FILE_RENAMED', {
-        oldName: file.name,
-        nameWithExtension: destination.nameWithExtension(),
-      });
       return;
     }
 

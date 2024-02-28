@@ -1,35 +1,29 @@
 import { CreateFilePlaceholderOnDeletionFailed } from '../../../../context/virtual-drive/files/application/CreateFilePlaceholderOnDeletionFailed';
 import { FileCreator } from '../../../../context/virtual-drive/files/application/FileCreator';
 import { FileDeleter } from '../../../../context/virtual-drive/files/application/FileDeleter';
-import { FileFinderByContentsId } from '../../../../context/virtual-drive/files/application/FileFinderByContentsId';
+import { FileFolderContainerDetector } from '../../../../context/virtual-drive/files/application/FileFolderContainerDetector';
 import { FilePathUpdater } from '../../../../context/virtual-drive/files/application/FilePathUpdater';
 import { FilePlaceholderCreatorFromContentsId } from '../../../../context/virtual-drive/files/application/FilePlaceholderCreatorFromContentsId';
+import { FileRepositoryInitializer } from '../../../../context/virtual-drive/files/application/FileRepositoryInitializer';
+import { FileSynchronizer } from '../../../../context/virtual-drive/files/application/FileSyncronizer';
 import { FilesPlaceholderUpdater } from '../../../../context/virtual-drive/files/application/FilesPlaceholderUpdater';
 import { FilesPlaceholderCreator } from '../../../../context/virtual-drive/files/application/FilesPlaceholdersCreator';
-import { RepositoryPopulator } from '../../../../context/virtual-drive/files/application/RepositoryPopulator';
 import { RetrieveAllFiles } from '../../../../context/virtual-drive/files/application/RetrieveAllFiles';
 import { SameFileWasMoved } from '../../../../context/virtual-drive/files/application/SameFileWasMoved';
-import { FileFolderContainerDetector } from '../../../../context/virtual-drive/files/application/FileFolderContainerDetector';
-import { FileSyncronizer } from '../../../../context/virtual-drive/files/application/FileSyncronizer';
-import { FilePlaceholderConverter } from '../../../../context/virtual-drive/files/application/FIlePlaceholderConverter';
-import { FileSyncStatusUpdater } from '../../../../context/virtual-drive/files/application/FileSyncStatusUpdater';
-import { FileCheckerStatusInRoot } from '../../../../context/virtual-drive/files/application/FileCheckerStatusInRoot';
+import { SingleFileMatchingFinder } from '../../../../context/virtual-drive/files/application/SingleFileMatchingFinder';
 
 export interface FilesContainer {
-  fileFinderByContentsId: FileFinderByContentsId;
   fileDeleter: FileDeleter;
   fileFolderContainerDetector: FileFolderContainerDetector;
   filePathUpdater: FilePathUpdater;
   fileCreator: FileCreator;
-  fileSyncronizer: FileSyncronizer;
+  fileSyncronizer: FileSynchronizer;
   filePlaceholderCreatorFromContentsId: FilePlaceholderCreatorFromContentsId;
   createFilePlaceholderOnDeletionFailed: CreateFilePlaceholderOnDeletionFailed;
   sameFileWasMoved: SameFileWasMoved;
   retrieveAllFiles: RetrieveAllFiles;
-  repositoryPopulator: RepositoryPopulator;
+  repositoryPopulator: FileRepositoryInitializer;
   filesPlaceholderCreator: FilesPlaceholderCreator;
   filesPlaceholderUpdater: FilesPlaceholderUpdater;
-  filePlaceholderConverter: FilePlaceholderConverter;
-  fileSyncStatusUpdater: FileSyncStatusUpdater;
-  filesCheckerStatusInRoot: FileCheckerStatusInRoot;
+  singleFileMatchingFinder: SingleFileMatchingFinder;
 }

@@ -1,17 +1,20 @@
 import { FolderFinder } from '../../folders/application/FolderFinder';
 import { File } from '../../files/domain/File';
 import { Folder } from '../../folders/domain/Folder';
-import { FileRepository } from '../domain/FileRepository';
 import { FileNotFoundError } from '../domain/errors/FileNotFoundError';
+import { SingleFileMatchingFinder } from './SingleFileMatchingFinder';
 
 export class FileFolderContainerDetector {
   constructor(
-    private readonly repository: FileRepository,
+    private readonly singleFileMatchingFinder: SingleFileMatchingFinder,
     private readonly folderFinder: FolderFinder
   ) {}
 
-  run(contentId: File['contentsId'], folderContentId: Folder['uuid']): boolean {
-    const file = this.repository.searchByPartial({
+  async run(
+    contentId: File['contentsId'],
+    folderContentId: Folder['uuid']
+  ): Promise<boolean> {
+    const file = await this.singleFileMatchingFinder.run({
       contentsId: contentId,
     });
     if (!file) {

@@ -1,34 +1,31 @@
 import Logger from 'electron-log';
 import path from 'path';
-import { Readable } from 'stream';
 import { ensureFolderExists } from '../../../../apps/shared/fs/ensure-folder-exists';
-import { SyncEngineIpc } from '../../../../apps/sync-engine/ipcRendererSyncEngine';
+import { SyncEngineIpc } from '../../../../apps/sync-engine/SyncEngineIpc';
 import { File } from '../../files/domain/File';
 import { EventBus } from '../../shared/domain/EventBus';
 import { ContentsManagersFactory } from '../domain/ContentsManagersFactory';
 import { LocalFileContents } from '../domain/LocalFileContents';
-import { LocalFileWriter } from '../domain/LocalFileWriter';
 import { ContentFileDownloader } from '../domain/contentHandlers/ContentFileDownloader';
-import { TemporalFolderProvider } from './temporalFolderProvider';
-import * as fs from 'fs';
+import { LocalFileSystem } from '../domain/LocalFileSystem';
+import { LocalFileContentsDirectoryProvider } from '../../shared/domain/LocalFileContentsDirectoryProvider';
+import { DriveDesktopError } from '../../../shared/domain/errors/DriveDesktopError';
+import fs from 'fs';
 
 export class ContentsDownloader {
-  private readableDownloader: Readable | null;
   constructor(
     private readonly managerFactory: ContentsManagersFactory,
-    private readonly localWriter: LocalFileWriter,
+    private readonly localFileSystem: LocalFileSystem,
     private readonly ipc: SyncEngineIpc,
-    private readonly temporalFolderProvider: TemporalFolderProvider,
+    private readonly localFileContentsDirectoryProvider: LocalFileContentsDirectoryProvider,
     private readonly eventBus: EventBus
-  ) {
-    this.readableDownloader = null;
-  }
+  ) {}
 
   private async registerEvents(downloader: ContentFileDownloader, file: File) {
-    const location = await this.temporalFolderProvider();
-    ensureFolderExists(location);
-
-    const filePath = path.join(location, file.nameWithExtension);
+    const location = await this.localFileContentsDirectoryProvider.provide();
+    const folderPath = path.join(location, 'internxt');
+    ensureFolderExists(folderPath);
+    const filePath = path.join(folderPath, file.nameWithExtension);
 
     downloader.on('start', () => {
       this.ipc.send('FILE_DOWNLOADING', {
@@ -60,17 +57,21 @@ export class ContentsDownloader {
     });
 
     downloader.on('error', (error: Error) => {
+      const cause =
+        error instanceof DriveDesktopError ? error.syncErrorCause : 'UNKNOWN';
+
       this.ipc.send('FILE_DOWNLOAD_ERROR', {
         name: file.name,
         extension: file.type,
         nameWithExtension: file.nameWithExtension,
-        error: error.message,
+        cause,
       });
     });
 
     downloader.on('finish', () => {
       // cb(true, filePath);
       // The file download being finished does not mean it has been hidratated
+      // The file download being finished does not mean it has been hydrated
       // TODO: We might want to track this time instead of the whole completion time
     });
   }
@@ -81,7 +82,6 @@ export class ContentsDownloader {
     await this.registerEvents(downloader, file);
 
     const readable = await downloader.download(file);
-    this.readableDownloader = readable;
 
     const localContents = LocalFileContents.downloadedFrom(
       file,
@@ -89,7 +89,7 @@ export class ContentsDownloader {
       downloader.elapsedTime()
     );
 
-    const write = await this.localWriter.write(localContents);
+    const write = await this.localFileSystem.write(localContents);
 
     const events = localContents.pullDomainEvents();
     await this.eventBus.publish(events);

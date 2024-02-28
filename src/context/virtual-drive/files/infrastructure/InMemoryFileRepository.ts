@@ -2,14 +2,41 @@ import { File, FileAttributes } from '../domain/File';
 import { FileRepository } from '../domain/FileRepository';
 
 export class InMemoryFileRepository implements FileRepository {
-  private files: Map<string, FileAttributes>;
+  private files: Map<File['contentsId'], FileAttributes>;
 
   private get values(): Array<FileAttributes> {
     return Array.from(this.files.values());
   }
 
-  constructor() {
+  constructor(files?: Array<File>) {
     this.files = new Map();
+    if (files) {
+      files.forEach((file) =>
+        this.files.set(file.contentsId, file.attributes())
+      );
+    }
+  }
+
+  async searchById(id: number): Promise<File | undefined> {
+    const files = this.files.values();
+
+    for (const attributes of files) {
+      if (id === attributes.id) {
+        return File.from(attributes);
+      }
+    }
+
+    return undefined;
+  }
+
+  async searchByContentsId(id: string): Promise<File | undefined> {
+    const attributes = this.files.get(id);
+
+    if (!attributes) {
+      return;
+    }
+
+    return File.from(attributes);
   }
 
   public all(): Promise<Array<File>> {
@@ -42,10 +69,10 @@ export class InMemoryFileRepository implements FileRepository {
     return files;
   }
 
-  searchByPartial(partial: Partial<FileAttributes>): File | undefined {
+  matchingPartial(partial: Partial<FileAttributes>): Array<File> {
     const keys = Object.keys(partial) as Array<keyof Partial<FileAttributes>>;
 
-    const file = this.values.find((attributes) => {
+    const filesAttributes = this.values.filter((attributes) => {
       return keys.every((key: keyof FileAttributes) => {
         if (key === 'contentsId') {
           return (
@@ -57,11 +84,11 @@ export class InMemoryFileRepository implements FileRepository {
       });
     });
 
-    if (file) {
-      return File.from(file);
+    if (!filesAttributes) {
+      return [];
     }
 
-    return undefined;
+    return filesAttributes.map((attributes) => File.from(attributes));
   }
 
   async delete(id: File['contentsId']): Promise<void> {

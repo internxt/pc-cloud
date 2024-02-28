@@ -51,7 +51,7 @@ export function applicationOpened() {
   );
 }
 
-export function userSignin() {
+export function userSigning() {
   const { uuid: userId, email } = ConfigStore.get('userData');
 
   client.identify(
@@ -65,7 +65,7 @@ export function userSignin() {
     () => {
       client.track({
         userId,
-        event: 'User Signin',
+        event: 'User Signing',
         properties: { email },
         context: deviceContext,
       });
@@ -73,7 +73,7 @@ export function userSignin() {
   );
 }
 
-export function userSigninFailed(email?: string) {
+export function userSigningFailed(email?: string) {
   const clientId = ConfigStore.get('clientId');
 
   client.identify(
@@ -86,7 +86,7 @@ export function userSigninFailed(email?: string) {
     () => {
       client.track({
         anonymousId: clientId,
-        event: 'User Signin Failed',
+        event: 'User Signing Failed',
         properties: { email },
         context: deviceContext,
       });
@@ -100,77 +100,6 @@ export function userLogout() {
   client.track({
     userId,
     event: 'User Logout',
-  });
-}
-
-export function syncStarted(numberOfItems: number) {
-  const { uuid: userId } = ConfigStore.get('userData');
-
-  client.track({
-    userId,
-    event: 'Sync Started',
-    properties: {
-      number_of_items: numberOfItems,
-    },
-    context: deviceContext,
-  });
-}
-
-export function syncPaused(numberOfItems: number) {
-  const { uuid: userId } = ConfigStore.get('userData');
-
-  client.track({
-    userId,
-    event: 'Sync Paused',
-    properties: {
-      number_of_items: numberOfItems,
-    },
-    context: deviceContext,
-  });
-}
-
-export function syncBlocked(numberOfItems: number) {
-  const { uuid: userId } = ConfigStore.get('userData');
-
-  // Sync can be blocked beacuse the user is unauthorized
-  // In that case we don't have user data to track
-  if (!userId) {
-    return;
-  }
-
-  client.track({
-    userId,
-    event: 'Sync Blocked',
-    properties: {
-      number_of_items: numberOfItems,
-    },
-    context: deviceContext,
-  });
-}
-
-export function syncError(numberOfItems: number) {
-  const { uuid: userId } = ConfigStore.get('userData');
-
-  client.track({
-    userId,
-    event: 'Sync Error',
-    properties: {
-      number_of_items: numberOfItems,
-    },
-    context: deviceContext,
-  });
-}
-
-export function syncFinished(numberOfItems: number) {
-  const { uuid: userId } = ConfigStore.get('userData');
-
-  client.track({
-    userId,
-    event: 'Sync Finished',
-    properties: {
-      number_of_items: numberOfItems,
-    },
-    context: deviceContext,
   });
 }
 
@@ -266,7 +195,7 @@ export function trackEvent(
     properties,
     context: deviceContext,
   };
-  Logger.debug('Tracked event', payload);
+  Logger.debug('Tracked event', event);
 
   client.track(payload);
 }

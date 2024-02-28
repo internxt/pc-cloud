@@ -1,6 +1,6 @@
 import Logger from 'electron-log';
 import { ipcRenderer } from 'electron';
-import { DependencyContainerFactory } from './dependency-injection/DependencyContainerFactory';
+import { SyncEngineDependencyContainerFactory } from './dependency-injection/SyncEngineDependencyContainerFactory';
 import packageJson from '../../../package.json';
 import { BindingsManager } from './BindingManager';
 import fs from 'fs/promises';
@@ -24,7 +24,7 @@ async function setUp() {
 
   await ensureTheFolderExist(virtualDrivePath);
 
-  const factory = new DependencyContainerFactory();
+  const factory = new SyncEngineDependencyContainerFactory();
   const container = await factory.build();
 
   const bindings = new BindingsManager(container, {
@@ -71,6 +71,10 @@ async function setUp() {
       Logger.error('[SYNC ENGINE] Error stopping and cleaning: ', error);
       event.sender.send('ERROR_ON_STOP_AND_CLEAR_SYNC_ENGINE_PROCESS');
     }
+  });
+
+  ipcRenderer.on('SYNC_ENGINE:PING', (event) => {
+    event.sender.send('SYNC_ENGINE:PONG');
   });
 
   await bindings.start(

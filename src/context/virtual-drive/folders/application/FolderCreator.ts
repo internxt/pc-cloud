@@ -1,40 +1,61 @@
-import { SyncEngineIpc } from '../../../../apps/sync-engine/ipcRendererSyncEngine';
 import { EventBus } from '../../shared/domain/EventBus';
 import { Folder } from '../domain/Folder';
+import { FolderCreatedAt } from '../domain/FolderCreatedAt';
+import { FolderId } from '../domain/FolderId';
+import { FolderPath } from '../domain/FolderPath';
 import { FolderRepository } from '../domain/FolderRepository';
-import { OfflineFolder } from '../domain/OfflineFolder';
+import { FolderStatuses } from '../domain/FolderStatus';
+import { FolderUpdatedAt } from '../domain/FolderUpdatedAt';
+import { FolderUuid } from '../domain/FolderUuid';
+import { FolderInPathAlreadyExistsError } from '../domain/errors/FolderInPathAlreadyExistsError';
 import { RemoteFileSystem } from '../domain/file-systems/RemoteFileSystem';
-import { FolderPlaceholderConverter } from './FolderPlaceholderConverter';
+import { ParentFolderFinder } from './ParentFolderFinder';
 
 export class FolderCreator {
   constructor(
     private readonly repository: FolderRepository,
+    private readonly parentFolderFinder: ParentFolderFinder,
     private readonly remote: RemoteFileSystem,
-    private readonly ipc: SyncEngineIpc,
-    private readonly eventBus: EventBus,
-    private readonly folderPlaceholderConverter: FolderPlaceholderConverter
+    private readonly eventBus: EventBus
   ) {}
 
-  async run(offlineFolder: OfflineFolder): Promise<Folder> {
-    this.ipc.send('FOLDER_CREATING', {
-      name: offlineFolder.basename,
+  private async ensureItDoesNotExists(path: FolderPath): Promise<void> {
+    const result = this.repository.matchingPartial({
+      path: path.value,
+      status: FolderStatuses.EXISTS,
     });
 
-    const attributes = await this.remote.persist(offlineFolder);
+    if (result.length > 0) {
+      throw new FolderInPathAlreadyExistsError(path);
+    }
+  }
 
-    const folder = Folder.create(attributes);
+  private async findParentId(path: FolderPath): Promise<FolderId> {
+    const parent = await this.parentFolderFinder.run(path);
+    return new FolderId(parent.id);
+  }
+
+  async run(path: string): Promise<void> {
+    const folderPath = new FolderPath(path);
+
+    await this.ensureItDoesNotExists(folderPath);
+
+    const parentId = await this.findParentId(folderPath);
+
+    const response = await this.remote.persist(folderPath, parentId);
+
+    const folder = Folder.create(
+      new FolderId(response.id),
+      new FolderUuid(response.uuid),
+      folderPath,
+      parentId,
+      FolderCreatedAt.fromString(response.createdAt),
+      FolderUpdatedAt.fromString(response.updatedAt)
+    );
 
     await this.repository.add(folder);
 
     const events = folder.pullDomainEvents();
     this.eventBus.publish(events);
-
-    await this.folderPlaceholderConverter.run(folder);
-
-    this.ipc.send('FOLDER_CREATED', {
-      name: offlineFolder.name,
-    });
-
-    return folder;
   }
 }

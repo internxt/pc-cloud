@@ -45,7 +45,7 @@ export class EnvironmentContentFileDownloader implements ContentFileDownloader {
         file.contentsId,
         {
           progressCallback: (progress: number) => {
-            this.eventEmitter.emit('progress', progress);
+            this.eventEmitter.emit('progress', progress, this.elapsedTime());
           },
           finishedCallback: async (err: Error, stream: Readable) => {
             Logger.debug('[FinishedCallback] Stream is ready');
@@ -55,8 +55,7 @@ export class EnvironmentContentFileDownloader implements ContentFileDownloader {
               this.eventEmitter.emit('error', err);
               return reject(err);
             }
-
-            this.eventEmitter.emit('finish');
+            this.eventEmitter.emit('finish', this.elapsedTime());
 
             stream.on('close', () => {
               Logger.debug('[FinishedCallback] Stream closed');

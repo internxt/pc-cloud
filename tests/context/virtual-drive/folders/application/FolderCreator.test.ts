@@ -1,95 +1,151 @@
+import { InvalidArgumentError } from '../../../../../src/context/shared/domain/errors/InvalidArgumentError';
 import { FolderCreator } from '../../../../../src/context/virtual-drive/folders/application/FolderCreator';
+import { ParentFolderFinder } from '../../../../../src/context/virtual-drive/folders/application/ParentFolderFinder';
 import { Folder } from '../../../../../src/context/virtual-drive/folders/domain/Folder';
+import { FolderId } from '../../../../../src/context/virtual-drive/folders/domain/FolderId';
+import { FolderStatuses } from '../../../../../src/context/virtual-drive/folders/domain/FolderStatus';
+import { FolderInPathAlreadyExistsError } from '../../../../../src/context/virtual-drive/folders/domain/errors/FolderInPathAlreadyExistsError';
+import { FolderNotFoundError } from '../../../../../src/context/virtual-drive/folders/domain/errors/FolderNotFoundError';
+import { FolderPersistedDto } from '../../../../../src/context/virtual-drive/folders/domain/file-systems/RemoteFileSystem';
 import { EventBusMock } from '../../shared/__mock__/EventBusMock';
-import { IpcRendererSyncEngineMock } from '../../shared/__mock__/IpcRendererSyncEngineMock';
-import { FolderPlaceholderConverterMock } from '../__mocks__/FolderPlaceholderConverterMock';
 import { FolderRemoteFileSystemMock } from '../__mocks__/FolderRemoteFileSystemMock';
 import { FolderRepositoryMock } from '../__mocks__/FolderRepositoryMock';
 import { FolderMother } from '../domain/FolderMother';
-import { OfflineFolderMother } from '../domain/OfflineFolderMother';
-import { FolderLocalFileSystemMock } from '../__mocks__/FolderLocalFileSystemMock';
+import { FolderPathMother } from '../domain/FolderPathMother';
 
 describe('Folder Creator', () => {
-  let SUT: FolderCreator;
-
   let repository: FolderRepositoryMock;
   let remote: FolderRemoteFileSystemMock;
-  let syncEngineIpc: IpcRendererSyncEngineMock;
   let eventBus: EventBusMock;
-  let folderPlaceholderConverter: FolderPlaceholderConverterMock;
-  let folderLocalFileSystemMock: FolderLocalFileSystemMock;
+
+  let SUT: FolderCreator;
 
   beforeEach(() => {
     repository = new FolderRepositoryMock();
-    syncEngineIpc = new IpcRendererSyncEngineMock();
     remote = new FolderRemoteFileSystemMock();
-
     eventBus = new EventBusMock();
-    folderPlaceholderConverter = new FolderPlaceholderConverterMock(
-      folderLocalFileSystemMock
-    );
+    const parentFolderFinder = new ParentFolderFinder(repository);
 
-    SUT = new FolderCreator(
-      repository,
-      remote,
-      syncEngineIpc,
-      eventBus,
-      folderPlaceholderConverter
+    SUT = new FolderCreator(repository, parentFolderFinder, remote, eventBus);
+  });
+
+  const mockCorrectPersistance = (folder: Folder) => {
+    remote.persistMock.mockResolvedValueOnce({
+      id: folder.id,
+      uuid: folder.uuid,
+      createdAt: folder.createdAt.toISOString(),
+      updatedAt: folder.updatedAt.toISOString(),
+      parentId: folder.parentId as number,
+    } satisfies FolderPersistedDto);
+  };
+
+  it('throws an InvalidArgument error if the path is not a valid posix path', async () => {
+    const nonPosixPath = 'C:\\Users\\Internxt';
+
+    try {
+      await SUT.run(nonPosixPath);
+      fail('Expected InvalidArgumentError, but no error was thrown.');
+    } catch (err) {
+      expect(err).toBeInstanceOf(InvalidArgumentError);
+    }
+  });
+
+  it('throws a FolderInPathAlreadyExists error if there is a folder on the desired path', async () => {
+    const path = FolderPathMother.any().value;
+    const folder = FolderMother.fromPartial({
+      path,
+      status: FolderStatuses.EXISTS,
+    });
+
+    repository.matchingPartialMock.mockReturnValueOnce([folder]);
+
+    try {
+      await SUT.run(path);
+      fail('Expected FolderInPathAlreadyExistsError, but no error was thrown.');
+    } catch (err) {
+      expect(err).toBeInstanceOf(FolderInPathAlreadyExistsError);
+    }
+  });
+
+  it('throws a FolderNotFounded error if the parent folder is not founded', async () => {
+    const path = FolderPathMother.any().value;
+
+    repository.matchingPartialMock
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([]);
+
+    try {
+      await SUT.run(path);
+      fail('Expected FolderNotFoundError, but no error was thrown.');
+    } catch (err) {
+      expect(err).toBeInstanceOf(FolderNotFoundError);
+    }
+  });
+
+  it('persists a folder in the remote fs when the parent folder is found and the path is available', async () => {
+    const path = FolderPathMother.any();
+    const parent = FolderMother.fromPartial({ path: path.dirname() });
+    const folderCreated = FolderMother.fromPartial({
+      path: path.value,
+      parentId: parent.id,
+    });
+
+    mockCorrectPersistance(folderCreated);
+
+    repository.matchingPartialMock
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([parent]);
+
+    await SUT.run(path.value);
+
+    expect(remote.persistMock).toBeCalledWith(
+      path,
+      new FolderId(parent.id),
+      undefined // optional parameter
     );
   });
 
-  it('creates on a folder from a offline folder', async () => {
-    const offlineFolder = OfflineFolderMother.random();
-    const folder = FolderMother.fromPartial(offlineFolder.attributes());
+  it('add the folder to the repository', async () => {
+    const path = FolderPathMother.any();
+    const parent = FolderMother.fromPartial({ path: path.dirname() });
+    const folderCreated = FolderMother.fromPartial({
+      path: path.value,
+      parentId: parent.id,
+    });
 
-    remote.persistMock.mockResolvedValueOnce(folder.attributes());
+    mockCorrectPersistance(folderCreated);
 
-    repository.addMock.mockResolvedValueOnce(Promise.resolve());
+    repository.matchingPartialMock
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([parent]);
 
-    await SUT.run(offlineFolder);
+    await SUT.run(path.value);
 
-    expect(repository.addMock).toBeCalledWith(folder);
+    expect(repository.addMock).toBeCalledWith(
+      expect.objectContaining(folderCreated)
+    );
   });
 
-  describe('Synchronization messages', () => {
-    it('sends the message FOLDER_CREATING', async () => {
-      const offlineFolder = OfflineFolderMother.random();
-
-      const resultFolderAttributes = FolderMother.fromPartial(
-        offlineFolder.attributes()
-      ).attributes();
-
-      remote.persistMock.mockResolvedValueOnce(resultFolderAttributes);
-
-      repository.addMock.mockResolvedValueOnce(
-        Folder.create(resultFolderAttributes)
-      );
-
-      await SUT.run(offlineFolder);
-
-      expect(syncEngineIpc.sendMock).toBeCalledWith('FOLDER_CREATING', {
-        name: offlineFolder.name,
-      });
+  it('publishes folder created event', async () => {
+    const path = FolderPathMother.any();
+    const parent = FolderMother.fromPartial({ path: path.dirname() });
+    const folderCreated = FolderMother.fromPartial({
+      path: path.value,
+      parentId: parent.id,
     });
 
-    it('sends the message FOLDER_CREATED', async () => {
-      const offlineFolder = OfflineFolderMother.random();
+    mockCorrectPersistance(folderCreated);
 
-      const resultFolderAttributes = FolderMother.fromPartial(
-        offlineFolder.attributes()
-      ).attributes();
+    repository.matchingPartialMock
+      .mockReturnValueOnce([])
+      .mockReturnValueOnce([parent]);
 
-      repository.addMock.mockResolvedValueOnce(
-        Folder.create(resultFolderAttributes)
-      );
+    await SUT.run(path.value);
 
-      remote.persistMock.mockResolvedValueOnce(resultFolderAttributes);
-
-      await SUT.run(offlineFolder);
-
-      expect(syncEngineIpc.sendMock).toBeCalledWith('FOLDER_CREATED', {
-        name: offlineFolder.name,
-      });
-    });
+    expect(eventBus.publishMock).toBeCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ aggregateId: folderCreated.uuid }),
+      ])
+    );
   });
 });

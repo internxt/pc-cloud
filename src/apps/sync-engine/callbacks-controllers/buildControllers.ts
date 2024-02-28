@@ -1,4 +1,4 @@
-import { DependencyContainer } from '../dependency-injection/DependencyContainer';
+import { SyncEngineDependencyContainer } from '../dependency-injection/SyncEngineDependencyContainer';
 import { AddController } from './controllers/AddController';
 import { DeleteController } from './controllers/DeleteController';
 import { DownloadFileController } from './controllers/DownloadFileController';
@@ -6,7 +6,7 @@ import { NotifyPlaceholderHydrationFinished } from './controllers/NotifyPlacehol
 import { RenameOrMoveController } from './controllers/RenameOrMoveController';
 import { OfflineRenameOrMoveController } from './controllers/offline/OfflineRenameOrMoveController';
 
-export function buildControllers(container: DependencyContainer) {
+export function buildControllers(container: SyncEngineDependencyContainer) {
   const addFileController = new AddController(
     container.absolutePathToRelativeConverter,
     container.fileCreationOrchestrator,
@@ -29,7 +29,7 @@ export function buildControllers(container: DependencyContainer) {
   );
 
   const downloadFileController = new DownloadFileController(
-    container.fileFinderByContentsId,
+    container.singleFileMatchingFinder,
     container.contentsDownloader
   );
 

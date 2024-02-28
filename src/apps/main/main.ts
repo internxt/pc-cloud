@@ -16,8 +16,7 @@ import './auth/handlers';
 import './windows/settings';
 import './windows/process-issues';
 import './windows';
-import './background-processes/sync-engine';
-import './background-processes/process-issues';
+import './issues/virtual-drive';
 import './device/handlers';
 import './usage/handlers';
 import './realtime';
@@ -31,6 +30,7 @@ import './migration/handlers';
 import './config/handlers';
 import './app-info/handlers';
 import './remote-sync/handlers';
+import './virtual-drive';
 
 import { app, nativeTheme } from 'electron';
 import Logger from 'electron-log';
@@ -69,8 +69,12 @@ if (process.env.SENTRY_DSN) {
 }
 
 function checkForUpdates() {
-  autoUpdater.logger = Logger;
-  autoUpdater.checkForUpdatesAndNotify();
+  try {
+    autoUpdater.logger = Logger;
+    autoUpdater.checkForUpdatesAndNotify();
+  } catch (err: unknown) {
+    Logger.error(err);
+  }
 }
 
 if (process.platform === 'darwin') {

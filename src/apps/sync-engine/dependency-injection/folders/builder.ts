@@ -1,13 +1,11 @@
-import { NodeWinLocalFileSystem } from '../../../../context/virtual-drive/folders/infrastructure/NodeWinLocalFileSystem';
 import { AllParentFoldersStatusIsExists } from '../../../../context/virtual-drive/folders/application/AllParentFoldersStatusIsExists';
-import { FolderByPartialSearcher } from '../../../../context/virtual-drive/folders/application/FolderByPartialSearcher';
-import { FolderCreator } from '../../../../context/virtual-drive/folders/application/FolderCreator';
+import { FolderCreatorFromOfflineFolder } from '../../../../context/virtual-drive/folders/application/FolderCreatorFromOfflineFolder';
 import { FolderDeleter } from '../../../../context/virtual-drive/folders/application/FolderDeleter';
-import { FolderFinder } from '../../../../context/virtual-drive/folders/application/FolderFinder';
+import { ParentFolderFinder } from '../../../../context/virtual-drive/folders/application/ParentFolderFinder';
 import { FolderMover } from '../../../../context/virtual-drive/folders/application/FolderMover';
 import { FolderPathUpdater } from '../../../../context/virtual-drive/folders/application/FolderPathUpdater';
 import { FolderRenamer } from '../../../../context/virtual-drive/folders/application/FolderRenamer';
-import { FolderRepositoryInitiator } from '../../../../context/virtual-drive/folders/application/FolderRepositoryInitiator';
+import { FolderRepositoryInitializer } from '../../../../context/virtual-drive/folders/application/FolderRepositoryInitializer';
 import { FoldersPlaceholderCreator } from '../../../../context/virtual-drive/folders/application/FoldersPlaceholderCreator';
 import { OfflineFolderCreator } from '../../../../context/virtual-drive/folders/application/Offline/OfflineFolderCreator';
 import { OfflineFolderMover } from '../../../../context/virtual-drive/folders/application/Offline/OfflineFolderMover';
@@ -20,7 +18,9 @@ import { FolderPlaceholderUpdater } from '../../../../context/virtual-drive/fold
 import { HttpRemoteFileSystem } from '../../../../context/virtual-drive/folders/infrastructure/HttpRemoteFileSystem';
 import { InMemoryFolderRepository } from '../../../../context/virtual-drive/folders/infrastructure/InMemoryFolderRepository';
 import { InMemoryOfflineFolderRepository } from '../../../../context/virtual-drive/folders/infrastructure/InMemoryOfflineFolderRepository';
-import { ipcRendererSyncEngine } from '../../ipcRendererSyncEngine';
+import { NodeWinLocalFileSystem } from '../../../../context/virtual-drive/folders/infrastructure/NodeWinLocalFileSystem';
+import { BackgroundProcessSyncFolderMessenger } from '../../../../context/virtual-drive/folders/infrastructure/SyncMessengers/BackgroundProcessSyncFolderMessenger';
+import { SyncEngineIPC } from '../../SyncEngineIpc';
 import { DependencyInjectionHttpClientsProvider } from '../common/clients';
 import { DependencyInjectionEventBus } from '../common/eventBus';
 import { DependencyInjectionEventRepository } from '../common/eventRepository';
@@ -32,6 +32,7 @@ import { FolderContainerDetector } from '../../../../context/virtual-drive/folde
 import { FolderPlaceholderConverter } from '../../../../context/virtual-drive/folders/application/FolderPlaceholderConverter';
 import { FolderSyncStatusUpdater } from '../../../../context/virtual-drive/folders/application/FolderSyncStatusUpdater';
 import { FoldersFatherSyncStatusUpdater } from '../../../../context/virtual-drive/folders/application/FoldersFatherSyncStatusUpdater';
+import { FolderFinder } from '../../../../context/virtual-drive/folders/application/FolderFinder';
 
 export async function buildFoldersContainer(
   shredContainer: SharedContainer
@@ -48,12 +49,17 @@ export async function buildFoldersContainer(
     shredContainer.relativePathToAbsoluteConverter
   );
   const remoteFileSystem = new HttpRemoteFileSystem(
+    //  @ts-ignore
     clients.drive,
     clients.newDrive
   );
 
   const folderPlaceholderConverter = new FolderPlaceholderConverter(
     localFileSystem
+  );
+
+  const syncFolderMessenger = new BackgroundProcessSyncFolderMessenger(
+    SyncEngineIPC
   );
 
   const folderSyncStatusUpdater = new FolderSyncStatusUpdater(localFileSystem);
@@ -64,35 +70,35 @@ export async function buildFoldersContainer(
     repository
   );
 
-  const folderDeleter = new FolderDeleter(
-    repository,
-    remoteFileSystem,
-    localFileSystem,
-    allParentFoldersStatusIsExists
+  const parentFolderFinder = new ParentFolderFinder(repository);
+
+  const retryFolderDeleter = new RetryFolderDeleter(
+    new FolderDeleter(
+      repository,
+      remoteFileSystem,
+      localFileSystem,
+      allParentFoldersStatusIsExists
+    )
   );
 
-  const retryFolderDeleter = new RetryFolderDeleter(folderDeleter);
-
-  const folderCreator = new FolderCreator(
+  const folderCreator = new FolderCreatorFromOfflineFolder(
     repository,
     remoteFileSystem,
-    ipcRendererSyncEngine,
     eventBus,
-    folderPlaceholderConverter
+    syncFolderMessenger
   );
 
   const folderMover = new FolderMover(
     repository,
     remoteFileSystem,
-    folderFinder
+    parentFolderFinder
   );
   const folderRenamer = new FolderRenamer(
     repository,
     remoteFileSystem,
-    ipcRendererSyncEngine
+    eventBus,
+    syncFolderMessenger
   );
-
-  const folderByPartialSearcher = new FolderByPartialSearcher(repository);
 
   const folderPathUpdater = new FolderPathUpdater(
     repository,
@@ -102,14 +108,14 @@ export async function buildFoldersContainer(
 
   const offlineRepository = new InMemoryOfflineFolderRepository();
   const offlineFolderCreator = new OfflineFolderCreator(
-    folderFinder,
+    parentFolderFinder,
     offlineRepository,
     repository
   );
 
   const offlineFolderMover = new OfflineFolderMover(
     offlineRepository,
-    folderFinder
+    parentFolderFinder
   );
   const offlineFolderRenamer = new OfflineFolderRenamer(offlineRepository);
   const offlineFolderPathUpdater = new OfflineFolderPathUpdater(
@@ -129,7 +135,7 @@ export async function buildFoldersContainer(
       synchronizeOfflineModifications
     );
 
-  const folderRepositoryInitiator = new FolderRepositoryInitiator(repository);
+  const folderRepositoryInitiator = new FolderRepositoryInitializer(repository);
 
   const foldersPlaceholderCreator = new FoldersPlaceholderCreator(
     localFileSystem
@@ -148,14 +154,12 @@ export async function buildFoldersContainer(
   );
 
   return {
-    folderCreator,
     folderFinder,
-    folderDeleter,
+    folderCreator,
+    parentFolderFinder,
     retryFolderDeleter,
     allParentFoldersStatusIsExists: allParentFoldersStatusIsExists,
     folderPathUpdater,
-    folderContainerDetector,
-    folderByPartialSearcher,
     synchronizeOfflineModificationsOnFolderCreated,
     offline: {
       folderCreator: offlineFolderCreator,

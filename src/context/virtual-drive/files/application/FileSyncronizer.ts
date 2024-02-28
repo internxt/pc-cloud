@@ -7,7 +7,6 @@ import Logger from 'electron-log';
 import { FileCreator } from './FileCreator';
 import { AbsolutePathToRelativeConverter } from '../../shared/application/AbsolutePathToRelativeConverter';
 import { FolderNotFoundError } from '../../folders/domain/errors/FolderNotFoundError';
-import { FolderCreator } from '../../folders/application/FolderCreator';
 import { OfflineFolderCreator } from '../../folders/application/Offline/OfflineFolderCreator';
 import { Folder } from '../../folders/domain/Folder';
 import * as fs from 'fs';
@@ -15,8 +14,9 @@ import { File } from '../domain/File';
 import { FileSyncStatusUpdater } from './FileSyncStatusUpdater';
 import { FilePlaceholderConverter } from './FIlePlaceholderConverter';
 import { FileContentsUpdater } from './FileContentsUpdater';
+import { FolderCreatorFromOfflineFolder } from '../../folders/application/FolderCreatorFromOfflineFolder';
 
-export class FileSyncronizer {
+export class FileSynchronizer {
   // queue of files to be uploaded
   private foldersPathQueue: string[] = [];
   constructor(
@@ -25,11 +25,10 @@ export class FileSyncronizer {
     private readonly filePlaceholderConverter: FilePlaceholderConverter,
     private readonly fileCreator: FileCreator,
     private readonly absolutePathToRelativeConverter: AbsolutePathToRelativeConverter,
-    private readonly folderCreator: FolderCreator,
+    private readonly folderCreator: FolderCreatorFromOfflineFolder,
     private readonly offlineFolderCreator: OfflineFolderCreator,
     private readonly fileContentsUpdater: FileContentsUpdater
-  ) // private readonly foldersFatherSyncStatusUpdater: FoldersFatherSyncStatusUpdater
-  {}
+  ) {}
 
   async run(
     absolutePath: string,
@@ -43,10 +42,10 @@ export class FileSyncronizer {
 
     const path = new FilePath(posixRelativePath);
 
-    const existingFile = this.repository.searchByPartial({
+    const existingFile = this.repository.matchingPartial({
       path: PlatformPathConverter.winToPosix(path.value),
       status: FileStatuses.EXISTS,
-    });
+    })[0];
 
     await this.sync(
       existingFile,
@@ -110,7 +109,9 @@ export class FileSyncronizer {
   };
 
   private async runFolderCreator(posixRelativePath: string): Promise<Folder> {
-    const offlineFolder = this.offlineFolderCreator.run(posixRelativePath);
+    const offlineFolder = await this.offlineFolderCreator.run(
+      posixRelativePath
+    );
     return this.folderCreator.run(offlineFolder);
   }
 
