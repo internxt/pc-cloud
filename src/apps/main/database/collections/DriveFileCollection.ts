@@ -67,4 +67,12 @@ export class DriveFilesCollection
       success: result.affected ? true : false,
     };
   }
+
+  async allFilesWeight(): Promise<number> {
+    const result = await this.repository.query(
+      'SELECT SUM(f.size) as weight FROM drive_file f WHERE f.status !="DELETED" '
+    );
+
+    return result[0].weight;
+  }
 }

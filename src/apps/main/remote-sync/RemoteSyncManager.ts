@@ -21,7 +21,7 @@ export class RemoteSyncManager {
   private onStatusChangeCallbacks: Array<
     (newStatus: RemoteSyncStatus) => void
   > = [];
-  private totalFilesSynced = 0;
+  public totalFilesSynced = 0;
   private totalFoldersSynced = 0;
   constructor(
     private db: {

@@ -9,6 +9,7 @@ import { ipcMain } from 'electron';
 import { reportError } from '../bug-report/service';
 import { sleep } from '../util';
 import { broadcastToWindows } from '../windows';
+import { getUsageService } from '../usage/handlers';
 
 let initialSyncReady = false;
 const driveFilesCollection = new DriveFilesCollection();
@@ -49,6 +50,39 @@ export async function getUpdatedRemoteItems() {
         'Something failed when updating the local db pulling the new changes from remote',
     });
     throw error;
+  }
+}
+
+function getLocalFilesWeight(): Promise<number> {
+  return driveFilesCollection.allFilesWeight();
+}
+
+async function checkSizesAndResync() {
+  const usageService = getUsageService();
+
+  const oldRemoteUsage = await usageService.getDriveUsage();
+  const oldLocalUsage = await getLocalFilesWeight();
+
+  if (oldLocalUsage != oldRemoteUsage) {
+    Logger.warn(
+      'LOCAL AND REMOTE SIZE DON MATCH. Old remote usage:',
+      oldRemoteUsage,
+      'Old local usage: ',
+      oldRemoteUsage
+    );
+  }
+  Logger.info('Local files before:', remoteSyncManager.totalFilesSynced);
+
+  clearRemoteSyncStore();
+  await startRemoteSync();
+
+  Logger.info('Current Local files :', remoteSyncManager.totalFilesSynced);
+
+  const currentRemoteUsage = await usageService.getDriveUsage();
+  const currentLocalUsage = await getLocalFilesWeight();
+
+  if (currentLocalUsage !== currentRemoteUsage) {
+    Logger.warn('NEW SIZE DOES NOT MATCH EITHER');
   }
 }
 

@@ -1,6 +1,9 @@
 import { ipcMain } from 'electron';
 import eventBus from '../event-bus';
 import { buildUsageService } from './serviceBuilder';
+import { UserUsageService } from './service';
+
+let service: UserUsageService | null = null;
 
 function regiterUsageHandlers() {
   ipcMain.handle('get-usage', () => {
@@ -10,3 +13,11 @@ function regiterUsageHandlers() {
 }
 
 eventBus.on('APP_IS_READY', regiterUsageHandlers);
+
+export function getUsageService(): UserUsageService {
+  if (!service) {
+    service = buildUsageService();
+  }
+
+  return service;
+}
