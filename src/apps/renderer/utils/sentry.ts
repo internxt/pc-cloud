@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/electron/renderer';
+// import * as Sentry from '@sentry/electron/renderer';
 import { User } from '../../main/types';
 
 /**
@@ -7,11 +7,11 @@ import { User } from '../../main/types';
  * @param enabled Whether Sentry should be enabled or not
  */
 export const initSentry = () => {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    enabled: true, // it is true but is using app.isPackaged from the main process
-  });
-  Sentry.captureMessage('Render process started');
+  // Sentry.init({
+  //   dsn: process.env.SENTRY_DSN,
+  //   enabled: true, // it is true but is using app.isPackaged from the main process
+  // });
+  // Sentry.captureMessage('Render process started');
 };
 
 /**
@@ -24,9 +24,8 @@ export const reportError = (
   error: unknown,
   context: Record<string, string> = {}
 ) => {
-  Sentry.captureException(error, context);
+  // Sentry.captureException(error, context);
 };
-
 
 /**
  * Set user context in Sentry
@@ -34,11 +33,11 @@ export const reportError = (
  */
 export const setUserContextForReports = (user: User) => {
   if (!user) {
-    Sentry.setUser(null);
+    // Sentry.setUser(null);
     return;
   }
-  Sentry.setUser({
-    email: user.email,
-    id: user.uuid,
-  });
+  // Sentry.setUser({
+  //   email: user.email,
+  //   id: user.uuid,
+  // });
 };

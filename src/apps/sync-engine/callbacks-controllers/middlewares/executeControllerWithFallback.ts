@@ -1,5 +1,5 @@
 import Logger from 'electron-log';
-import * as Sentry from '@sentry/electron/renderer';
+// import * as Sentry from '@sentry/electron/renderer';
 
 export const executeControllerWithFallback =
   <Action extends (...args: any[]) => void>({
@@ -28,7 +28,7 @@ export const executeControllerWithFallback =
       });
     } catch (error: unknown) {
       Logger.error(error);
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       callback(false);
     }
   };

@@ -2,7 +2,7 @@ import { DatabaseCollectionAdapter } from '../adapters/base';
 import { AppDataSource } from '../data-source';
 import { DriveFile } from '../entities/DriveFile';
 import { Repository } from 'typeorm';
-import * as Sentry from '@sentry/electron/main';
+// import * as Sentry from '@sentry/electron/main';
 import Logger from 'electron-log';
 
 export class DriveFilesCollection
@@ -86,7 +86,7 @@ export class DriveFilesCollection
         result: queryResult,
       };
     } catch (error) {
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       Logger.error('Error fetching newest drive file:', error);
       return {
         success: false,

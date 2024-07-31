@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/electron/renderer';
+// import * as Sentry from '@sentry/electron/renderer';
 import Logger from 'electron-log';
 import { SyncEngineIpc } from '../../../../apps/sync-engine/ipcRendererSyncEngine';
 import {
@@ -132,7 +132,7 @@ export class Traverser {
       }).fold(
         (error): void => {
           Logger.warn('[Traverser] Error adding file:', error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
           this.ipc.send('SYNC_PROBLEM', {
             key: 'node-duplicated',
             additionalData: {
@@ -191,7 +191,7 @@ export class Traverser {
       }).fold(
         (error) => {
           Logger.warn(`[Traverser] :  ${error} `);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
           this.ipc.send('SYNC_PROBLEM', {
             key: 'node-duplicated',
             additionalData: {

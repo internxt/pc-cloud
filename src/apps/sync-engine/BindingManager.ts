@@ -14,7 +14,7 @@ import { ProcessIssue } from '../shared/types';
 import { ipcRenderer } from 'electron';
 import { ServerFileStatus } from '../../context/shared/domain/ServerFile';
 import { ServerFolderStatus } from '../../context/shared/domain/ServerFolder';
-import * as Sentry from '@sentry/electron/renderer';
+// import * as Sentry from '@sentry/electron/renderer';
 import { runner } from '../utils/runner';
 import { QueueManager } from './dependency-injection/common/QueueManager';
 import { DependencyInjectionLogWatcherPath } from './dependency-injection/common/logEnginePath';
@@ -85,7 +85,7 @@ export class BindingsManager {
           })
           .catch((error: Error) => {
             Logger.error(error);
-            Sentry.captureException(error);
+            // Sentry.captureException(error);
             callback(false);
           });
         ipcRenderer.send('CHECK_SYNC');
@@ -187,7 +187,7 @@ export class BindingsManager {
             );
           } catch (error) {
             Logger.error('notify: ', error);
-            Sentry.captureException(error);
+            // Sentry.captureException(error);
             // await callback(false, '');
             fs.unlinkSync(path);
 
@@ -199,7 +199,7 @@ export class BindingsManager {
           Logger.debug('[Fetch Data Callback] Finish...', path);
         } catch (error) {
           Logger.error(error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
           await callback(false, '');
           await this.container.virtualDrive.closeDownloadMutex();
         }
@@ -222,7 +222,7 @@ export class BindingsManager {
           ipcRenderer.send('CHECK_SYNC');
         } catch (error) {
           Logger.error(error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
           callback(false);
         }
       },
@@ -296,7 +296,7 @@ export class BindingsManager {
         } catch (error) {
           Logger.error(`error adding file ${task.path}`);
           Logger.error(error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
         }
       },
       handleHydrate: async (task: QueueItem) => {
@@ -322,7 +322,7 @@ export class BindingsManager {
         } catch (error) {
           Logger.error(`error hydrating file ${task.path}`);
           Logger.error(error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
         }
       },
       handleDehydrate: async (task: QueueItem) => {
@@ -332,7 +332,7 @@ export class BindingsManager {
         } catch (error) {
           Logger.error(`error dehydrating file ${task.path}`);
           Logger.error(error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
         }
       },
       handleChangeSize: async (task: QueueItem) => {
@@ -342,7 +342,7 @@ export class BindingsManager {
         } catch (error) {
           Logger.error(`error changing size ${task.path}`);
           Logger.error(error);
-          Sentry.captureException(error);
+          // Sentry.captureException(error);
         }
       },
     });
@@ -422,7 +422,7 @@ export class BindingsManager {
       ipcRenderer.send('CHECK_SYNC');
     } catch (error) {
       Logger.error('[SYNC ENGINE] ', error);
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
     }
   }
 
@@ -444,7 +444,7 @@ export class BindingsManager {
       ipcRenderer.send('CHECK_SYNC');
     } catch (error) {
       Logger.error('[SYNC ENGINE] Polling', error);
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
     }
   }
   async getFileInSyncPending(): Promise<string[]> {
@@ -458,7 +458,7 @@ export class BindingsManager {
       return fileInPendingPaths;
     } catch (error) {
       Logger.error('[SYNC ENGINE]  Updating unsync files error: ', error);
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       return [];
     }
   }

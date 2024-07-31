@@ -5,14 +5,14 @@ import packageJson from '../../../package.json';
 import { BindingsManager } from './BindingManager';
 import fs from 'fs/promises';
 import { iconPath } from '../utils/icon';
-import * as Sentry from '@sentry/electron/renderer';
+// import * as Sentry from '@sentry/electron/renderer';
 
 function initSentry() {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    enabled: true, // it is true but is using app.isPackaged from the main process
-  });
-  Sentry.captureMessage('Sync engine process started');
+  // Sentry.init({
+  //   dsn: process.env.SENTRY_DSN,
+  //   enabled: true, // it is true but is using app.isPackaged from the main process
+  // });
+  // Sentry.captureMessage('Sync engine process started');
 }
 
 initSentry();
@@ -94,7 +94,7 @@ async function setUp() {
       event.sender.send('SYNC_ENGINE_STOP_AND_CLEAR_SUCCESS');
     } catch (error: unknown) {
       Logger.error('[SYNC ENGINE] Error stopping and cleaning: ', error);
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       event.sender.send('ERROR_ON_STOP_AND_CLEAR_SYNC_ENGINE_PROCESS');
     }
   });
@@ -121,10 +121,10 @@ setUp()
   })
   .catch((error) => {
     Logger.error('[SYNC ENGINE] Error setting up', error);
-    Sentry.captureException(error);
+    // Sentry.captureException(error);
     if (error.toString().includes('Error: ConnectSyncRoot failed')) {
       Logger.info('[SYNC ENGINE] We neeed to restart the app virtual drive');
-      Sentry.captureMessage('Restarting sync engine virtual drive is required');
+      // Sentry.captureMessage('Restarting sync engine virtual drive is required');
     }
     ipcRenderer.send('SYNC_ENGINE_PROCESS_SETUP_FAILED');
   });

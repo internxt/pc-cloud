@@ -37,7 +37,7 @@ import Logger from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import packageJson from '../../../package.json';
 import eventBus from './event-bus';
-import * as Sentry from '@sentry/electron/main';
+// import * as Sentry from '@sentry/electron/main';
 import { AppDataSource } from './database/data-source';
 import { getIsLoggedIn } from './auth/handlers';
 import {
@@ -65,12 +65,12 @@ Logger.log(`Running ${packageJson.version}`);
 Logger.log('Initializing Sentry for main process');
 if (process.env.SENTRY_DSN) {
   Logger.log(`App is packaged: ${app.isPackaged}`);
-  Sentry.init({
-    // Enable Sentry only when app is packaged
-    enabled: app.isPackaged,
-    dsn: process.env.SENTRY_DSN,
-  });
-  Sentry.captureMessage('Main process started');
+  // Sentry.init({
+  //   // Enable Sentry only when app is packaged
+  //   enabled: app.isPackaged,
+  //   dsn: process.env.SENTRY_DSN,
+  // });
+  // Sentry.captureMessage('Main process started');
   Logger.log('Sentry is ready for main process');
 } else {
   Logger.error('Sentry DSN not found, cannot initialize Sentry');
