@@ -7,13 +7,13 @@ type TProps = {
   task: QueueItem;
 };
 
-export class HandleHydrateService {
+export class HandleDehydrateService {
   async run({ drive, task }: TProps) {
     try {
-      logger.debug({ fn: 'handleHydrate', task });
-      await drive.hydrateFile(task.path);
+      logger.debug({ fn: 'handleDehydrate', task });
+      drive.dehydrateFile(task.path);
     } catch (error) {
-      logger.error({ fn: 'handleHydrate', task, error });
+      logger.error({ fn: 'handleDehydrate', task, error });
       Sentry.captureException(error);
     }
   }

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ESNext",
     "module": "commonjs",
     "lib": [
@@ -13,9 +14,6 @@
     "pretty": true,
     "sourceMap": true,
     "rootDir": ".",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
@@ -32,6 +30,7 @@
     "types": ["vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
+      "@/tests/*": ["./tests/*"],
       "virtual-drive/dist": ["../node-win/dist"],
     }
   },

@@ -28,7 +28,7 @@ ipcMain.on('SYNC_ENGINE_PROCESS_SETUP_FAILED', () => {
 async function healthCheck() {
   const responsePromise = new Promise<void>((resolve, reject) => {
     ipcMain.once('SYNC_ENGINE:PONG', () => {
-      Logger.debug('Health check PONG resolved');
+      // Logger.debug('Health check PONG resolved');
       resolve();
     });
 
@@ -56,7 +56,7 @@ function scheduleHeathCheck() {
   const relaunchOnFail = () =>
     healthCheck()
       .then(() => {
-        Logger.debug('Health check succeeded');
+        // Logger.debug('Health check succeeded');
       })
       .catch(() => {
         const warning = 'Health check failed, relaunching the worker';
@@ -73,10 +73,10 @@ function scheduleHeathCheck() {
 
   healthCheckSchedule = nodeSchedule.scheduleJob('*/40 * * * * *', async () => {
     const workerIsPending = checkSyncEngineInProcess(5_000);
-    Logger.debug(
-      'Health check',
-      workerIsPending ? 'Worker is pending' : 'Worker is running'
-    );
+    // Logger.debug(
+    //   'Health check',
+    //   workerIsPending ? 'Worker is pending' : 'Worker is running'
+    // );
     if (!workerIsPending) {
       await relaunchOnFail();
     }

@@ -1,3 +1,6 @@
+/examples/tmp
+/test-files
+
 # Logs
 logs
 *.log
