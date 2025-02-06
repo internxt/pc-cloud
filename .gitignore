@@ -31,6 +31,8 @@ npm-debug.log.*
 .npmrc
 .env
 
+clamAV
+
 src/test/screenshots
 
 *.db
