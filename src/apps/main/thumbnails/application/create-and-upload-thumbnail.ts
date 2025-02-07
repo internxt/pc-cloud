@@ -13,11 +13,7 @@ export interface ThumbnailToUpload {
   content: Buffer;
 }
 
-export async function createAndUploadThumbnail(
-  fileId: number,
-  name: string,
-  path: string
-) {
+export async function createAndUploadThumbnail(fileId: number, name: string, path: string) {
   Logger.info(`[THUMBNAIL] Uploading thumbnail for ${path}`);
 
   try {
@@ -25,9 +21,7 @@ export async function createAndUploadThumbnail(
 
     const image = await obtainImageToThumbnailIt(path);
     if (!image) {
-      Logger.warn(
-        `[THUMBNAIL] No image found to create a thumbnail for ${name}`
-      );
+      Logger.warn(`[THUMBNAIL] No image found to create a thumbnail for ${name}`);
       return;
     }
 

@@ -35,11 +35,7 @@ async function healthCheck() {
     const millisecondsToWait = 10_000;
 
     setTimeout(() => {
-      reject(
-        new Error(
-          `Health check failed after ${millisecondsToWait} milliseconds`
-        )
-      );
+      reject(new Error(`Health check failed after ${millisecondsToWait} milliseconds`));
     }, millisecondsToWait);
   });
 
@@ -73,10 +69,7 @@ function scheduleHeathCheck() {
 
   healthCheckSchedule = nodeSchedule.scheduleJob('*/40 * * * * *', async () => {
     const workerIsPending = checkSyncEngineInProcess(5_000);
-    Logger.debug(
-      'Health check',
-      workerIsPending ? 'Worker is pending' : 'Worker is running'
-    );
+    Logger.debug('Health check', workerIsPending ? 'Worker is pending' : 'Worker is running');
     if (!workerIsPending) {
       await relaunchOnFail();
     }
@@ -129,7 +122,7 @@ function spawnSyncEngineWorker() {
       Logger.error('[MAIN] Error loading sync engine worker', err);
       Sentry.captureException(err);
     });
-  
+
   worker.webContents.on('console-message', (event, level, message) => {
     console.log(`[WORKER CONSOLE ${level}] ${message}`);
   });
@@ -172,11 +165,7 @@ export async function stopSyncEngineWatcher() {
     const millisecondsToWait = 10_000;
 
     setTimeout(() => {
-      reject(
-        new Error(
-          `Timeout waiting for sync engine to stop after ${millisecondsToWait} milliseconds`
-        )
-      );
+      reject(new Error(`Timeout waiting for sync engine to stop after ${millisecondsToWait} milliseconds`));
     }, millisecondsToWait);
   });
 
@@ -209,14 +198,11 @@ async function stopAndClearSyncEngineWatcher() {
   }
 
   const response = new Promise<void>((resolve, reject) => {
-    ipcMain.once(
-      'ERROR_ON_STOP_AND_CLEAR_SYNC_ENGINE_PROCESS',
-      (_, error: Error) => {
-        Logger.error('[MAIN] Error stopping sync engine worker', error);
-        Sentry.captureException(error);
-        reject(error);
-      }
-    );
+    ipcMain.once('ERROR_ON_STOP_AND_CLEAR_SYNC_ENGINE_PROCESS', (_, error: Error) => {
+      Logger.error('[MAIN] Error stopping sync engine worker', error);
+      Sentry.captureException(error);
+      reject(error);
+    });
 
     ipcMain.once('SYNC_ENGINE_STOP_AND_CLEAR_SUCCESS', () => {
       resolve();
@@ -226,11 +212,7 @@ async function stopAndClearSyncEngineWatcher() {
     const millisecondsToWait = 10_000;
 
     setTimeout(() => {
-      reject(
-        new Error(
-          `Timeout waiting for sync engine to stop after ${millisecondsToWait} milliseconds`
-        )
-      );
+      reject(new Error(`Timeout waiting for sync engine to stop after ${millisecondsToWait} milliseconds`));
     }, millisecondsToWait);
   });
 
@@ -251,12 +233,7 @@ async function stopAndClearSyncEngineWatcher() {
 
 export function updateSyncEngine() {
   try {
-    if (
-      worker &&
-      !worker.isDestroyed() &&
-      worker.webContents &&
-      !worker.webContents.isDestroyed()
-    ) {
+    if (worker && !worker.isDestroyed() && worker.webContents && !worker.webContents.isDestroyed()) {
       worker.webContents?.send('UPDATE_SYNC_ENGINE_PROCESS');
     }
   } catch (err) {
@@ -268,12 +245,7 @@ export function updateSyncEngine() {
 
 export function fallbackSyncEngine() {
   try {
-    if (
-      worker &&
-      !worker.isDestroyed() &&
-      worker.webContents &&
-      !worker.webContents.isDestroyed()
-    ) {
+    if (worker && !worker.isDestroyed() && worker.webContents && !worker.webContents.isDestroyed()) {
       worker?.webContents?.send('FALLBACK_SYNC_ENGINE_PROCESS');
     }
   } catch (err) {
@@ -282,12 +254,7 @@ export function fallbackSyncEngine() {
 }
 export async function sendUpdateFilesInSyncPending(): Promise<string[]> {
   try {
-    if (
-      worker &&
-      !worker.isDestroyed() &&
-      worker.webContents &&
-      !worker.webContents.isDestroyed()
-    ) {
+    if (worker && !worker.isDestroyed() && worker.webContents && !worker.webContents.isDestroyed()) {
       worker?.webContents?.send('UPDATE_UNSYNC_FILE_IN_SYNC_ENGINE_PROCESS');
     }
     return [];

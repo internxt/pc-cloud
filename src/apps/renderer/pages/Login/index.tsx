@@ -45,7 +45,7 @@ export default function Login() {
       const { message } = err as Error;
 
       const phaseToSet =
-        message === TOWFA_ERROR_MESSAGE ? '2fa' : 'credentials';
+      message === TOWFA_ERROR_MESSAGE ? '2fa' : 'credentials';
 
       setState('error');
       setPhase(phaseToSet);

@@ -35,9 +35,7 @@ export class FolderDeleter {
       );
 
       if (!allParentsExists) {
-        Logger.warn(
-          `Skipped folder deletion for ${folder.path}. A folder in a higher level is already marked as trashed`
-        );
+        Logger.warn(`Skipped folder deletion for ${folder.path}. A folder in a higher level is already marked as trashed`);
         return;
       }
 

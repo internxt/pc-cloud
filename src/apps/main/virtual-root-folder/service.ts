@@ -6,7 +6,7 @@ import path from 'path';
 import configStore from '../config';
 import eventBus from '../event-bus';
 
-const ROOT_FOLDER_NAME = 'InternxtDrive';
+const ROOT_FOLDER_NAME = 'PcCLoud';
 const HOME_FOLDER_PATH = app.getPath('home');
 
 const VIRTUAL_DRIVE_FOLDER = path.join(HOME_FOLDER_PATH, ROOT_FOLDER_NAME);
