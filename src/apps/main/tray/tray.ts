@@ -2,11 +2,7 @@ import { app, Menu, nativeImage, Tray } from 'electron';
 import path from 'path';
 import PackageJson from '../../../../package.json';
 import eventBus from '../event-bus';
-import {
-  getOrCreateWidged,
-  setBoundsOfWidgetByPath,
-  toggleWidgetVisibility,
-} from '../windows/widget';
+import { getOrCreateWidged, setBoundsOfWidgetByPath, toggleWidgetVisibility } from '../windows/widget';
 import { getIsLoggedIn } from '../auth/handlers';
 import { getAuthWindow } from '../windows/auth';
 import { quitApp } from '../quit';
@@ -20,11 +16,7 @@ export class TrayMenu {
     return this.tray.getBounds();
   }
 
-  constructor(
-    private readonly iconsPath: string,
-    private readonly onClick: () => Promise<void>,
-    private readonly onQuit: () => void
-  ) {
+  constructor(private readonly iconsPath: string, private readonly onClick: () => Promise<void>, private readonly onQuit: () => void) {
     const trayIcon = this.getIconPath('LOADING');
 
     this.tray = new Tray(trayIcon);
@@ -49,10 +41,7 @@ export class TrayMenu {
     const isDarwin = process.platform === 'darwin';
     const templatePart = isDarwin ? 'Template' : '';
 
-    return path.join(
-      this.iconsPath,
-      `${state.toLowerCase()}${templatePart}.png`
-    );
+    return path.join(this.iconsPath, `${state.toLowerCase()}${templatePart}.png`);
   }
 
   generateContextMenu() {
@@ -93,9 +82,9 @@ export class TrayMenu {
   setTooltip(state: TrayMenuState) {
     const messages: Record<TrayMenuState, string> = {
       SYNCING: 'Sync in process',
-      IDLE: `Internxt ${PackageJson.version}`,
+      IDLE: `PcCloud ${PackageJson.version}`,
       ALERT: 'There are some issues with your sync',
-      LOADING: 'Loading Internxt...',
+      LOADING: 'Loading PcCloud...',
     };
 
     const message = messages[state];

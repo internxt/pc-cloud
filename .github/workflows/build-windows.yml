@@ -17,15 +17,15 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           SET GH_TOKEN= ${{ secrets.GITHUB_TOKEN }}
-          if (Test-Path -Path "C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\drive-desktop") {
-            Remove-Item -Path "C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\drive-desktop" -Recurse -Force
+          if (Test-Path -Path "C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\pc-cloud") {
+            Remove-Item -Path "C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\pc-cloud" -Recurse -Force
             Write-Host "Folder deleted"
           } else {
             Write-Host "Folder does not exist. Skipping deletion."
           }
           cd C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\
-          git clone https://github.com/internxt/drive-desktop.git
-          cd drive-desktop
+          git clone https://github.com/internxt/pc-cloud.git
+          cd pc-cloud
           Copy-Item -Path "..\variables\.env" -Destination ".\"
           Copy-Item -Path "..\variables\.npmrc" -Destination ".\"
       - name: Run Python script
@@ -34,5 +34,5 @@ jobs:
           python check-sign.py
       - name: Check file
         run: |
-          cd "C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\drive-desktop"
+          cd "C:\Users\LENOVO\Desktop\Trabajo\drive-web-sign\pc-cloud"
           ls release/build/

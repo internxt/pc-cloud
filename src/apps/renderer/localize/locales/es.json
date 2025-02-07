@@ -31,13 +31,13 @@
   "onboarding": {
     "slides": {
       "welcome": {
-        "title": "¡Bienvenido a Internxt!",
+        "title": "¡Bienvenido a PcCloud!",
         "description": "Empieza haciendo una copia de seguridad de todos tus archivos y carpetas importantes en la barra lateral del buscador.",
         "take-tour": "Hacer recorrido"
       },
       "files-organization": {
         "title": "Accede y organiza todos tus archivos almacenados desde la barra lateral",
-        "description": "Tu carpeta personal de Internxt Drive se encuentra en tu barra lateral de {{platform_app}}."
+        "description": "Tu carpeta personal de PcCloud Drive se encuentra en tu barra lateral de {{platform_app}}."
       },
       "available-online": {
         "title": "Ahorra espacio en tu dispositivo con la descarga inteligente",
@@ -57,11 +57,11 @@
       },
       "antivirus": {
         "title": "Mantén tu ordenador protegido contra virus",
-        "description": "La aplicación de escritorio de Internxt ahora también cuenta con el nuevo Internxt Antivirus, con el que puedes escanear y eliminar cualquier posible malware de tu dispositivo."
+        "description": "La aplicación de escritorio de PcCloud ahora también cuenta con el nuevo PcCloud Antivirus, con el que puedes escanear y eliminar cualquier posible malware de tu dispositivo."
       },
       "backups": {
         "title": "Haz copias de seguridad de tu dispositivo en la nube",
-        "description": "Con la función mejorada de copias de seguridad de Internxt, ahora puedes hacer copias de seguridad de tus carpetas en la nube de manera segura para liberar espacio localmente."
+        "description": "Con la función mejorada de copias de seguridad de PcCloud, ahora puedes hacer copias de seguridad de tus carpetas en la nube de manera segura para liberar espacio localmente."
       },
       "onboarding-completed": {
         "title": "Ya está todo listo, ¡disfruta de tu privacidad!",
@@ -70,7 +70,7 @@
           "description": "Añade más carpetas y programa copias de seguridad automáticas en Configuración"
         },
         "desktop-ready": {
-          "title": "Internxt está listo",
+          "title": "PcCloud está listo",
           "description": "Accede a tus archivos almacenados desde la barra lateral de tu {{platform_phrase}}."
         }
       }
@@ -78,7 +78,7 @@
     "common": {
       "onboarding-progress": "{{current_slide}} de {{total_slides}}",
       "continue": "Continuar",
-      "open-drive": "Abrir Internxt",
+      "open-drive": "Abrir PcCloud",
       "skip": "Saltar",
       "platform-phrase": {
         "windows": "explorador de archivos",
@@ -90,7 +90,7 @@
   "migration": {
     "slides": {
       "welcome": {
-        "title": "Nueva actualización de la aplicación de escritorio de Internxt!",
+        "title": "Nueva actualización de la aplicación de escritorio de PcCloud!",
         "features": {
           "title": "Novedades en esta versión:",
           "feature-1": "Selecciona lo que desees descargar y ahorra espacio en el disco duro.",
@@ -105,12 +105,12 @@
       "migration-failed": {
         "title": "Nos aseguramos de que todos tus archivos están a salvo",
         "message": "No se han podido cargar algunos archivos",
-        "description": "Hemos movido esos archivos a tu escritorio, arrástralos y suéltalos en tu Internxt Drive",
+        "description": "Hemos movido esos archivos a tu escritorio, arrástralos y suéltalos en tu PcCloud Drive",
         "show-files": "Mostrar archivos"
       },
       "delete-old-drive-folder": {
-        "title": "Tu Internxt de siempre, en una nueva ubicación",
-        "message": "Tu carpeta personal de Internxt Drive se encuentra en la barra lateral {{platform_app}}."
+        "title": "Tu PcCloud de siempre, en una nueva ubicación",
+        "message": "Tu carpeta personal de PcCloud Drive se encuentra en la barra lateral {{platform_app}}."
       },
       "new-widget": {
         "title": "Sé más productivo con nuestro widget rediseñado",
@@ -121,7 +121,7 @@
     "common": {
       "continue": "Continuar",
       "cancel": "Cancelar",
-      "open-drive": "Abrir Internxt"
+      "open-drive": "Abrir PcCloud"
     }
   },
   "widget": {
@@ -143,7 +143,7 @@
         "logout-confirmation": {
           "no-sync-pending": {
             "title": "¿Cerrar sesión en este dispositivo?",
-            "message": "Internxt no se mostrará sin una cuenta iniciada.",
+            "message": "PcCloud no se mostrará sin una cuenta iniciada.",
             "confirm": "Cerrar sesión",
             "cancel": "Cancelar"
           },
@@ -175,7 +175,7 @@
       },
       "no-activity": {
         "title": "No hay actividad reciente",
-        "description": "La información aparecerá aquí cuando hagas cambios, para sincronizar tu carpeta local con Internxt Drive"
+        "description": "La información aparecerá aquí cuando hagas cambios, para sincronizar tu carpeta local con PcCloud Drive"
       },
       "upToDate": {
         "title": "Tus archivos están actualizados",
@@ -210,13 +210,13 @@
     },
     "virtual-drive-error": {
       "title": "No se puede montar tu Drive",
-      "message": "Estamos teniendo problemas para montar tu Internxt Drive, por favor inténtalo de nuevo",
+      "message": "Estamos teniendo problemas para montar tu PcCloud Drive, por favor inténtalo de nuevo",
       "mounting": "Montando..",
       "button": "Reintentar"
     },
     "banners": {
       "discover-backups": {
-        "title": " COPIAS DE SEGURIDAD DE INTERNXT",
+        "title": " COPIAS DE SEGURIDAD DE PcCloud",
         "body": "Mantén una copia de seguridad de tus carpetas y archivos más importantes.",
         "action": "Hacer copia"
       }
@@ -240,7 +240,7 @@
           "save": "Guardar"
         }
       },
-      "auto-startup": "Iniciar Internxt al arrancar el sistema",
+      "auto-startup": "Iniciar PcCloud al arrancar el sistema",
       "language": {
         "label": "Idioma",
         "options": {
@@ -258,13 +258,13 @@
         }
       },
       "sync": {
-        "folder": "Carpeta Internxt",
+        "folder": "Carpeta PcCloud",
         "change-folder": "Cambiar carpeta"
       },
       "app-info": {
         "open-logs": "Abrir registros",
         "open-migration": "Empezar migración",
-        "more": "Más información sobre Internxt"
+        "more": "Más información sobre PcCloud"
       }
     },
     "account": {
@@ -359,7 +359,7 @@
       },
       "deactivateAntivirus": {
         "title": "Windows Defender está activo",
-        "description": "Por favor, desactiva Windows Defender para poder usar Internxt Antivirus. Para hacerlo, abre Seguridad de Windows > Protección contra virus y amenazas > Administrar configuración > desactiva la Protección en tiempo real.",
+        "description": "Por favor, desactiva Windows Defender para poder usar PcCloud Antivirus. Para hacerlo, abre Seguridad de Windows > Protección contra virus y amenazas > Administrar configuración > desactiva la Protección en tiempo real.",
         "retry": "Reintentar",
         "cancel": "Cancelar"
       },
@@ -422,8 +422,8 @@
     "short-error-messages": {
       "unknown": "Error desconocido",
       "emtpy-file": "Archivos vacios no son soportados",
-      "bad-response": "Error de los servidores de Internxt",
-      "no-remote-connection": "No pudimos conectar con los servidores de Internxt",
+      "bad-response": "Error de los servidores de PcCloud",
+      "no-remote-connection": "No pudimos conectar con los servidores de PcCloud",
       "no-internet-connection": "No hay conexión a Internet",
       "no-permission": "Permisos insuficientes",
       "file-does-not-exist": "El archivo no existe",
@@ -435,17 +435,17 @@
     },
     "error-messages": {
       "no-internet": "No estás conectado a Internet, lo intentaremos más tarde",
-      "no-remote-connection": "No hemos podido conectar con los servidores de Internxt, lo intentaremos más tarde",
+      "no-remote-connection": "No hemos podido conectar con los servidores de PcCloud, lo intentaremos más tarde",
       "cannot-get-current-listings": "No pudimos obtener el estado de tus archivos actuales, lo intentaremos más tarde",
       "base-directory-does-not-exist": "No se pudo encontrar su carpeta de sincronización",
-      "insuficient-permision-accessing-base-directory": "Internxt App no tiene permiso para acceder a su carpeta de sincronización",
+      "insuficient-permision-accessing-base-directory": "PcCloud App no tiene permiso para acceder a su carpeta de sincronización",
       "cannot-access-base-directory": "No hemos podido acceder a su carpeta local",
       "cannot-access-tmp-directory": "No hemos podido acceder a su carpeta local",
       "unknown": "Error desconocido al intentar sincronizar sus archivos",
       "empty-file": "No admitimos archivos con un tamaño de 0 bytes debido a nuestros procesos de cifrado",
       "bad-response": "Error de servidor al procesar este archivo. Por favor, intente iniciar de nuevo el proceso de sincronización",
-      "file-does-not-exist": "Este archivo estaba presente cuando comparamos su carpeta local con su unidad Internxt, pero desapareció cuando intentamos acceder a él. Si has eliminado este archivo, no te preocupes, este error debería desaparecer la próxima vez que se inicie el proceso de sincronización",
-      "folder-does-not-exist": "Esta carpeta estaba presente cuando comparamos su carpeta local con su unidad Internxt, pero desapareció cuando intentamos acceder a ella. Si has eliminado esta carpeta, no te preocupes, este error debería desaparecer la próxima vez que se inicie el proceso de sincronización",
+      "file-does-not-exist": "Este archivo estaba presente cuando comparamos su carpeta local con su unidad PcCloud, pero desapareció cuando intentamos acceder a él. Si has eliminado este archivo, no te preocupes, este error debería desaparecer la próxima vez que se inicie el proceso de sincronización",
+      "folder-does-not-exist": "Esta carpeta estaba presente cuando comparamos su carpeta local con su unidad PcCloud, pero desapareció cuando intentamos acceder a ella. Si has eliminado esta carpeta, no te preocupes, este error debería desaparecer la próxima vez que se inicie el proceso de sincronización",
       "file-too-big": "El tamaño máximo de carga es de 20GB. Por favor, intenta con archivos más pequeños.",
       "file-non-extension": "Los archivos sin extensiones no son soportados. No sincronizado",
       "duplicated-node": "Hay dos elementos (archivo o carpeta) con el mismo nombre en una carpeta. Cambia el nombre de uno de ellos para sincronizar ambos.",
@@ -465,8 +465,8 @@
     }
   },
   "feedback": {
-    "window-title": "Comentarios sobre Internxt para Escritorio",
-    "title": "Comparte tus opiniones con Internxt",
+    "window-title": "Comentarios sobre PcCloud para Escritorio",
+    "title": "Comparte tus opiniones con PcCloud",
     "description": "Tus comentarios hacen que mejoremos y creemos mejores experiencias de producto",
     "placeholder": "Haznos saber lo que tienes en mente, lo que te gustaría mejorar o describe el error o problema",
     "characters-count": "{{character_count}}/{{character_limit}}",

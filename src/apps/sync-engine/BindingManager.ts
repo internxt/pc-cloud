@@ -9,14 +9,27 @@ import { ProcessIssue } from '../shared/types';
 import { ipcRenderer } from 'electron';
 import { ServerFileStatus } from '../../context/shared/domain/ServerFile';
 import { ServerFolderStatus } from '../../context/shared/domain/ServerFolder';
+import * as Sentry from '@sentry/electron/renderer';
+import { runner } from '../utils/runner';
+import { DependencyInjectionLogWatcherPath } from './dependency-injection/common/logEnginePath';
+import configStore from '../main/config';
+import { isTemporaryFile } from '../utils/isTemporalFile';
+import { FetchDataService } from './callbacks/fetchData.service';
+import { HandleHydrate } from './callbacks/handleHydrate.service';
 
 export type CallbackDownload = (success: boolean, filePath: string) => Promise<{ finished: boolean; progress: number }>;
 
 export type FileAddedCallback = (acknowledge: boolean, id: string) => Promise<boolean>;
 
 export class BindingsManager {
-  private static readonly PROVIDER_NAME = 'Internxt';
-  private progressBuffer = 0;
+  private static readonly PROVIDER_NAME = 'PcCloud';
+  progressBuffer = 0;
+  controllers: IControllers;
+
+  private queueManager: QueueManager | null = null;
+  lastHydrated = '';
+  private lastMoved = '';
+
   constructor(
     public readonly container: DependencyContainer,
     private readonly paths: {
@@ -116,71 +129,13 @@ export class BindingsManager {
         await this.controllers.addFile.execute(absolutePath);
         ipcRenderer.send('CHECK_SYNC');
       },
-      fetchDataCallback: (contentsId: FilePlaceholderId, callback: CallbackDownload) => {
-        try {
-          Logger.debug('[Fetch Data Callback] Donwloading begins');
-          const path = await controllers.downloadFile.execute(contentsId);
-          const file = controllers.downloadFile.fileFinderByContentsId(
-            contentsId
-              .replace(
-                // eslint-disable-next-line no-control-regex
-                /[\x00-\x1F\x7F-\x9F]/g,
-                ''
-              )
-              .split(':')[1]
-          );
-          Logger.debug('[Fetch Data Callback] Preparing begins', path);
-          let finished = false;
-          try {
-            while (!finished) {
-              const result = await callback(true, path);
-              finished = result.finished;
-              Logger.debug('callback result', result);
-
-              if (finished && result.progress === 0) {
-                throw new Error('Result progress is 0');
-              } else if (this.progressBuffer == result.progress) {
-                break;
-              } else {
-                this.progressBuffer = result.progress;
-              }
-              Logger.debug('condition', finished);
-              ipcRendererSyncEngine.send('FILE_PREPARING', {
-                name: file.name,
-                extension: file.type,
-                nameWithExtension: file.nameWithExtension,
-                size: file.size,
-                processInfo: {
-                  elapsedTime: 0,
-                  progress: result.progress,
-                },
-              });
-            }
-            this.progressBuffer = 0;
-
-            await controllers.notifyPlaceholderHydrationFinished.execute(contentsId);
-
-            await this.container.virtualDrive.closeDownloadMutex();
-          } catch (error) {
-            Logger.error('notify: ', error);
-            await this.container.virtualDrive.closeDownloadMutex();
-          }
-
-          // Esperar hasta que la ejecución de fetchDataCallback esté completa antes de continuar
-          await new Promise((resolve) => {
-            setTimeout(() => {
-              Logger.debug('timeout');
-              resolve(true);
-            }, 500);
-          });
-
-          fs.unlinkSync(path);
-          ipcRenderer.send('CHECK_SYNC');
-        } catch (error) {
-          Logger.error(error);
-          callback(false, '');
-        }
-      },
+      fetchDataCallback: (contentsId: FilePlaceholderId, callback: CallbackDownload) =>
+        this.fetchData.run({
+          self: this,
+          contentsId,
+          callback,
+          ipcRendererSyncEngine,
+        }),
       notifyMessageCallback: (
         message: string,
         action: ProcessIssue['action'],
@@ -240,7 +195,8 @@ export class BindingsManager {
 
     await this.container.virtualDrive.connectSyncRoot();
 
-    await this.load();
+    await runner([this.load.bind(this), this.polling.bind(this)]);
+    ipcRendererSyncEngine.send('SYNCED');
   }
 
   async watch() {
@@ -362,6 +318,22 @@ export class BindingsManager {
       await this.container.fileSyncOrchestrator.run(fileInPendingPaths);
     } catch (error) {
       Logger.error('[SYNC ENGINE] Polling', error);
+      Sentry.captureException(error);
+    }
+    ipcRendererSyncEngine.send('SYNCED');
+  }
+  async getFileInSyncPending(): Promise<string[]> {
+    try {
+      Logger.info('[SYNC ENGINE] Updating unsync files...');
+
+      const fileInPendingPaths = (await this.container.virtualDrive.getPlaceholderWithStatePending()) as Array<string>;
+      Logger.info('[SYNC ENGINE] fileInPendingPaths', fileInPendingPaths);
+
+      return fileInPendingPaths;
+    } catch (error) {
+      Logger.error('[SYNC ENGINE]  Updating unsync files error: ', error);
+      Sentry.captureException(error);
+      return [];
     }
   }
 }

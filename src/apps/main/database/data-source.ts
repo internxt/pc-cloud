@@ -6,7 +6,7 @@ import { DriveFile } from './entities/DriveFile';
 import { DriveFolder } from './entities/DriveFolder';
 import Logger from 'electron-log';
 import { ScannedItem } from './entities/ScannedItem';
-const dbPath = app.getPath('appData') + '/internxt-drive/internxt_desktop.db';
+const dbPath = app.getPath('appData') + '/pc-cloud/internxt_desktop.db';
 export const AppDataSource = new DataSource({
   type: 'better-sqlite3',
   database: dbPath,

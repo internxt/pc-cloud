@@ -1,9 +1,9 @@
 {
-  "name": "internxt-drive",
-  "version": "2.0.9",
-  "description": "Internxt Drive client UI",
+  "name": "pc-cloud",
+  "version": "2.4.2",
+  "description": "PcCloud client UI",
   "main": "./dist/main/main.js",
-  "author": "Internxt <hello@internxt.com>",
+  "author": "PcCloud <hello@internxt.com>",
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",

@@ -4,7 +4,7 @@ import Path from 'path';
 import { desktopEntryIsPresent, toggleDesktopEntry } from './linux-desktop-entry';
 
 const appFolder = Path.dirname(process.execPath);
-const appExe = Path.resolve(appFolder, 'Pc Cloud.exe');
+const appExe = Path.resolve(appFolder, 'PcCloud.exe');
 const exeName = Path.basename(process.execPath);
 
 const path = process.platform === 'win32' ? appExe : undefined;

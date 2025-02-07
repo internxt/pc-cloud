@@ -31,13 +31,13 @@
   "onboarding": {
     "slides": {
       "welcome": {
-        "title": "Welcome to Internxt!",
+        "title": "Welcome to PcCloud!",
         "description": "Let's start by backing up all of your important files and folders in your finder's sidebar.",
         "take-tour": "Take a tour"
       },
       "files-organization": {
         "title": "Access and organize all of your stored files from the sidebar",
-        "description": "Your personal Internxt Drive folder is located in your {{platform_app}} sidebar"
+        "description": "Your personal PcCloud Drive folder is located in your {{platform_app}} sidebar"
       },
       "available-online": {
         "title": "Save space on your device with smart download",
@@ -57,11 +57,11 @@
       },
       "antivirus": {
         "title": "Keep your computer safe from virus",
-        "description": "Internxt's Desktop app now also features the brand new Internxt Antivirus, with which you can scan and remove any potential malware from your device."
+        "description": "PcCloud's Desktop app now also features the brand new PcCloud Antivirus, with which you can scan and remove any potential malware from your device."
       },
       "backups": {
         "title": "Backup your device on the cloud",
-        "description": "With Internxt's upgraded backup feature, you can now safely backup folders on the cloud in order to free up space locally."
+        "description": "With PcCloud's upgraded backup feature, you can now safely backup folders on the cloud in order to free up space locally."
       },
       "onboarding-completed": {
         "title": "You're all set, enjoy your privacy!",
@@ -70,7 +70,7 @@
           "description": "Add more folders and schedule automatic backups in Settings"
         },
         "desktop-ready": {
-          "title": "Internxt is ready",
+          "title": "PcCloud is ready",
           "description": "Access your stored files from your {{platform_phrase}}’s sidebar"
         }
       }
@@ -79,7 +79,7 @@
       "onboarding-progress": "{{current_slide}} of {{total_slides}}",
       "continue": "Continue",
       "skip": "Skip",
-      "open-drive": "Open Internxt",
+      "open-drive": "Open PcCloud",
       "platform-phrase": {
         "windows": "file explorer",
         "linux": "file browser",
@@ -90,7 +90,7 @@
   "migration": {
     "slides": {
       "welcome": {
-        "title": "Internxt’s new desktop app is ready to go!",
+        "title": "PcCloud’s new desktop app is ready to go!",
         "features": {
           "title": "Fresh updates:",
           "feature-1": "Select what you want to download and save hard drive space.",
@@ -105,12 +105,12 @@
       "migration-failed": {
         "title": "Let's make sure all your files are safe",
         "message": "Some files could not be uploaded",
-        "description": "We’ve moved these files to your desktop, drag and drop them to your Internxt Drive",
+        "description": "We’ve moved these files to your desktop, drag and drop them to your PcCloud Drive",
         "show-files": "Show files"
       },
       "delete-old-drive-folder": {
-        "title": "Same Internxt Drive, new location",
-        "message": "Your personal Internxt Drive folder is located in your {{platform_app}} sidebar"
+        "title": "Same PcCloud Drive, new location",
+        "message": "Your personal PcCloud Drive folder is located in your {{platform_app}} sidebar"
       },
       "new-widget": {
         "title": "Be more productive with our redesigned widget",
@@ -121,7 +121,7 @@
     "common": {
       "continue": "Continue",
       "cancel": "Cancel",
-      "open-drive": "Open Internxt"
+      "open-drive": "Open PcCloud"
     }
   },
   "widget": {
@@ -143,7 +143,7 @@
         "logout-confirmation": {
           "no-sync-pending": {
             "title": "Log out from this device?",
-            "message": "Internxt Drive will not show up without an account logged in.",
+            "message": "PcCloud Drive will not show up without an account logged in.",
             "confirm": "Log out",
             "cancel": "Cancel"
           },
@@ -175,7 +175,7 @@
       },
       "no-activity": {
         "title": "There is no recent activity",
-        "description": "Information will show up here when changes are made to sync your local folder with Internxt Drive"
+        "description": "Information will show up here when changes are made to sync your local folder with PcCloud Drive"
       },
       "upToDate": {
         "title": "Your files are up to date",
@@ -210,13 +210,13 @@
     },
     "virtual-drive-error": {
       "title": "Can't mount your drive",
-      "message": "We are having issues mounting your Internxt Drive, please try again",
+      "message": "We are having issues mounting your PcCloud Drive, please try again",
       "mounting": "Mounting...",
       "button": "Try again"
     },
     "banners": {
       "discover-backups": {
-        "title": "INTERNXT BACKUPS",
+        "title": "PcCloud BACKUPS",
         "body": "Keep a lifesaver copy of your most important folders and files.",
         "action": "Backup this device"
       }
@@ -240,7 +240,7 @@
           "save": "Save"
         }
       },
-      "auto-startup": "Start Internxt on system startup",
+      "auto-startup": "Start PcCloud on system startup",
       "language": {
         "label": "Language",
         "options": {
@@ -258,13 +258,13 @@
         }
       },
       "sync": {
-        "folder": "Internxt Folder",
+        "folder": "PcCloud Folder",
         "change-folder": "Change folder"
       },
       "app-info": {
         "open-logs": "Open logs",
         "open-migration": "Start migration",
-        "more": "Learn more about Internxt"
+        "more": "Learn more about PcCloud"
       }
     },
     "account": {
@@ -360,7 +360,7 @@
       },
       "deactivateAntivirus": {
         "title": "Windows Defender is active",
-        "description": "Please disable Windows Defender to be able to use Internxt Antivirus. To do this, open Windows Security > Virus and Threat Protection > Manage settings > disable Real-time protection.",
+        "description": "Please disable Windows Defender to be able to use PcCloud Antivirus. To do this, open Windows Security > Virus and Threat Protection > Manage settings > disable Real-time protection.",
         "retry": "Retry",
         "cancel": "Cancel"
       },
@@ -439,8 +439,8 @@
     "short-error-messages": {
       "unknown": "Unknown error",
       "empty-file": "Empty files are not supported.",
-      "bad-response": "Bad response from Internxt servers",
-      "no-remote-connection": "Can't connect to Internxt servers",
+      "bad-response": "Bad response from PcCloud servers",
+      "no-remote-connection": "Can't connect to PcCloud servers",
       "no-internet-connection": "No internet connection",
       "no-permission": "Insufficient permissions",
       "file-does-not-exist": "File doesn't exist",
@@ -452,17 +452,17 @@
     },
     "error-messages": {
       "no-internet": "Looks like you are not connected to the internet, we'll try again later",
-      "no-remote-connection": "We could not connect to Internxt servers, we'll try again later",
+      "no-remote-connection": "We could not connect to PcCloud servers, we'll try again later",
       "cannot-get-current-listings": "We could not get the status of your current files, we'll try again later",
       "base-directory-does-not-exist": "Unable to find your sync folder",
-      "insuficient-permision-accessing-base-directory": "Internxt App does not have permission to access your sync folder",
+      "insuficient-permision-accessing-base-directory": "PcCloud App does not have permission to access your sync folder",
       "cannot-access-base-directory": "We could not access your local folder",
       "cannot-access-tmp-directory": "We could not access your  local folder",
       "unknown": "An unknown error ocurred while trying to sync your files",
       "empty-file": "We don't support files with a size of 0 bytes because of our processes of sharding and encryption",
       "bad-response": "We got a bad response from our servers while processing this file. Please, try starting the sync process again.",
-      "file-does-not-exist": "This file was present when we compared your local folder with your Internxt drive but disappeared when we tried to access it. If you deleted this file, don't worry, this error should dissapear the next time the sync process starts.",
-      "folder-does-not-exist": "This folder was present when we compared your local folder with your Internxt drive but disappeared when we tried to access it. If you deleted this folder, don't worry, this error should dissapear the next time the sync process starts.",
+      "file-does-not-exist": "This file was present when we compared your local folder with your PcCloud drive but disappeared when we tried to access it. If you deleted this file, don't worry, this error should dissapear the next time the sync process starts.",
+      "folder-does-not-exist": "This folder was present when we compared your local folder with your PcCloud drive but disappeared when we tried to access it. If you deleted this folder, don't worry, this error should dissapear the next time the sync process starts.",
       "file-too-big": "Max upload size is 20GB. Please try smaller files.",
       "file-non-extension": "Files without extensions are not supported. Not synchronized.",
       "duplicated-node": "There are two elements (file or folder) with the same name on a folder. Rename one of them to sync them both",
@@ -482,9 +482,9 @@
     }
   },
   "feedback": {
-    "window-title": "Internxt Desktop feedback",
-    "title": "Share feedback with Internxt",
-    "description": "Your feedback makes Internxt improve and helps us to create better product experiences",
+    "window-title": "PcCloud Desktop feedback",
+    "title": "Share feedback with PcCloud",
+    "description": "Your feedback makes PcCloud improve and helps us to create better product experiences",
     "placeholder": "Let us know what's in your mind, what you'd like to improve or describe the bug or issue",
     "characters-count": "{{character_count}}/{{character_limit}}",
     "send-feedback": "Send feedback",

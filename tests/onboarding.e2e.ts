@@ -26,7 +26,7 @@ test.describe('onboarding', () => {
       ipcMainEmit(electronApp, 'open-onboarding-window');
       const newPage = await electronApp.firstWindow();
       expect(newPage).toBeTruthy();
-      expect(await newPage.title()).toBe('Internxt');
+      expect(await newPage.title()).toBe('PcCloud');
       page = newPage;
     });
   });
@@ -34,7 +34,7 @@ test.describe('onboarding', () => {
   test.describe('welcome slide', () => {
     test('onboarding windows starts with welcome message', async () => {
       const content = await page.innerHTML('h3');
-      expect(content).toBe('Welcome to Internxt!');
+      expect(content).toBe('Welcome to PcCloud!');
     });
 
     test('welcome slide has lets go button', async () => {
@@ -68,7 +68,7 @@ test.describe('onboarding', () => {
 
       const title = await page.innerHTML('h3');
 
-      expect(title).toBe('Internxt Widget');
+      expect(title).toBe('PcCloud Widget');
     });
 
     test('widget slide has next button', async () => {
